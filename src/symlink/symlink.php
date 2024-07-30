@@ -37,9 +37,10 @@ class symlink
         $this->staticfolder =  $this->documentroot . DIRECTORY_SEPARATOR . 'static';
         $this->create_folder_if_not_exists(folder: $this->doxygenfolder);
         $this->create_folder_if_not_exists(folder: $this->staticfolder);
+        $this->staticfolder_bs =  $this->staticfolder . DIRECTORY_SEPARATOR . 'bs';
+        $this->create_folder_if_not_exists(folder: $this->staticfolder_bs);
 
         if (is_dir(filename: $this->staticfolder) and !empty(realpath(path: $this->staticfolder))) {
-            $this->check_env_and_create_folder_if_not_exists(env: 'BS');       // folder => link {dist, font, icons}
             $this->check_env_and_create_folder_if_not_exists(env: 'CSS');      // manual use
             $this->check_env_and_create_folder_if_not_exists(env: 'PHCSS');    // manual use
             $this->check_env_and_create_folder_if_not_exists(env: 'JS');       // manual use
@@ -101,24 +102,32 @@ class symlink
     function check_env_and_create_folder_if_not_exists(string|bool $env = null, int $permissions = 0755): void
     {
         if (isset($_ENV[$env]) and $_ENV[$env] === true) {
-            $folder =  $this->staticfolder . DIRECTORY_SEPARATOR . $env;
+            error_log($env);
+            $folder =  $this->staticfolder . DIRECTORY_SEPARATOR . strtolower($env);
+            error_log($folder);
             $this->create_folder_if_not_exists(folder: $folder, permissions: $permissions);
         }
     }
 
     function create_symlink(array $link): void
     {
+        // den link gibt es schon
+        if (is_link(filename: $link['link']) and readlink(path: $link['link']) ===  $link['target']) {
+            return;
+        }
+
         if (
             // wenn es noch keinen link gibt oder wenn der link nicht auf target zielt
-            (!is_link(filename: $link['link']) or readlink(path: $link['link']) !==  $link['target'])
+            !is_link(filename: $link['link'])
             and
             // wenn es aber ein target gibt
             (!empty(realpath(path: $link['target'])) and realpath(path: $link['target']) !== '/')
-            
+
         ) {
             try {
                 symlink(target: $link['target'], link: $link['link']);
             } catch (\Throwable $e) {
+                error_log("+++++" . $link);
                 \Sentry\captureException($e);
             }
         }
