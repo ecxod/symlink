@@ -1,0 +1,28 @@
+{
+    "name": "ecxod/symlink",
+    "description": "Langweilige Funktionen die man immer braucht",
+    "type": "library",
+    "keywords": ["ecxod", "symlink"],
+    "license": "MIT",
+    "autoload": {
+        "files": [
+            "src/symlink/symlink.php"
+        ],
+        "psr-4": {
+            "Ecxod\\Symlink\\": "src/symlink/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Christian Eichert",
+            "email": "c@zp1.net"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^7.2|^7.4|^8.0|^8.2"
+    },
+    "Suggests": {
+        "php": ">=7.2"
+    }
+}
