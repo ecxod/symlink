@@ -38,7 +38,7 @@ class symlink
         $this->create_folder_if_not_exists(folder: $this->doxygenfolder);
         $this->create_folder_if_not_exists(folder: $this->staticfolder);
 
-        if (!is_dir(filename: $this->staticfolder) and empty(realpath(path: $this->staticfolder))) {
+        if (is_dir(filename: $this->staticfolder) and !empty(realpath(path: $this->staticfolder))) {
             $this->check_env_and_create_folder_if_not_exists(env: 'BS');       // folder => link {dist, font, icons}
             $this->check_env_and_create_folder_if_not_exists(env: 'CSS');      // manual use
             $this->check_env_and_create_folder_if_not_exists(env: 'PHCSS');    // manual use
