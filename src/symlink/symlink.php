@@ -109,14 +109,12 @@ class symlink
     function create_symlink(array $link): void
     {
         if (
-            // wenn es noch keinen link gibt
-            !is_link(filename: $link['link'])
+            // wenn es noch keinen link gibt oder wenn der link nicht auf target zielt
+            (!is_link(filename: $link['link']) or readlink(path: $link['link']) !==  $link['target'])
             and
             // wenn es aber ein target gibt
             (!empty(realpath(path: $link['target'])) and realpath(path: $link['target']) !== '/')
-            and
-            // wenn der link nicht auf target zielt
-            readlink(path: $link['link']) !==  $link['target']
+            
         ) {
             try {
                 symlink(target: $link['target'], link: $link['link']);
