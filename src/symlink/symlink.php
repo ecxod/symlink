@@ -24,6 +24,7 @@ class symlink
     protected array $prismjs;
     protected array $popperjs;
     protected array $mathjax;
+    protected array $tinymce;
     protected string $documentroot;
     protected string $doxygenfolder;
     protected string $staticfolder;
@@ -38,14 +39,15 @@ class symlink
         $this->create_folder_if_not_exists(folder: $this->staticfolder);
 
         if (!is_dir(filename: $this->staticfolder) and empty(realpath(path: $this->staticfolder))) {
-            $this->check_env_and_create_folder_if_not_exists(env: 'bs');       // folder => link {dist, font, icons}
-            $this->check_env_and_create_folder_if_not_exists(env: 'css');      // manual use
-            $this->check_env_and_create_folder_if_not_exists(env: 'phcss');    // manual use
-            $this->check_env_and_create_folder_if_not_exists(env: 'js');       // manual use
-            $this->check_env_and_create_folder_if_not_exists(env: 'img');      // manual use
-            $this->check_env_and_create_folder_if_not_exists(env: 'mathjax');  // link
-            $this->check_env_and_create_folder_if_not_exists(env: 'popperjs'); // link
-            $this->check_env_and_create_folder_if_not_exists(env: 'prismjs');  // link
+            $this->check_env_and_create_folder_if_not_exists(env: 'BS');       // folder => link {dist, font, icons}
+            $this->check_env_and_create_folder_if_not_exists(env: 'CSS');      // manual use
+            $this->check_env_and_create_folder_if_not_exists(env: 'PHCSS');    // manual use
+            $this->check_env_and_create_folder_if_not_exists(env: 'JS');       // manual use
+            $this->check_env_and_create_folder_if_not_exists(env: 'IMG');      // manual use
+            $this->check_env_and_create_folder_if_not_exists(env: 'MATHJAX');  // link
+            $this->check_env_and_create_folder_if_not_exists(env: 'POPPERJS'); // link
+            $this->check_env_and_create_folder_if_not_exists(env: 'PRISMJS');  // link
+            $this->check_env_and_create_folder_if_not_exists(env: 'TINYMCE');  // link
         } else {
             die("BAD PROBLEM : COULD NOT FIND THE STATIC FOLDERS");
         }
@@ -81,14 +83,19 @@ class symlink
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . '@popperjs/core',
             'target' => realpath(path: $_SERVER['DOCUMENT_ROOT'] . '/../node_modules/@popperjs/core') . DIRECTORY_SEPARATOR
         ];
+        $this->tinymce = [
+            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'tinymce',
+            'target' => realpath(path: $_SERVER['DOCUMENT_ROOT'] . '/../node_modules/tinymce') . DIRECTORY_SEPARATOR
+        ];
 
-        ($_ENV['dist'] ? $this->create_symlink(link: $this->dist) : null);
-        ($_ENV['font'] ? $this->create_symlink(link: $this->font) : null);
-        ($_ENV['icons'] ? $this->create_symlink(link: $this->icons) : null);
-        ($_ENV['jquery'] ? $this->create_symlink(link: $this->jquery) : null);
-        ($_ENV['mathjax'] ? $this->create_symlink(link: $this->mathjax) : null);
-        ($_ENV['prismjs'] ? $this->create_symlink(link: $this->prismjs) : null);
-        ($_ENV['popperjs'] ? $this->create_symlink(link: $this->popperjs) : null);
+        ($_ENV['DIST'] ? $this->create_symlink(link: $this->dist) : null);
+        ($_ENV['FONT'] ? $this->create_symlink(link: $this->font) : null);
+        ($_ENV['ICONS'] ? $this->create_symlink(link: $this->icons) : null);
+        ($_ENV['JQUERY'] ? $this->create_symlink(link: $this->jquery) : null);
+        ($_ENV['MATHJAX'] ? $this->create_symlink(link: $this->mathjax) : null);
+        ($_ENV['PRISMJS'] ? $this->create_symlink(link: $this->prismjs) : null);
+        ($_ENV['POPPERJS'] ? $this->create_symlink(link: $this->popperjs) : null);
+        ($_ENV['TINYMCE'] ? $this->create_symlink(link: $this->tinymce) : null);
     }
 
     function check_env_and_create_folder_if_not_exists(string|bool $env = null, int $permissions = 0755): void
