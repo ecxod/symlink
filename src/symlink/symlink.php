@@ -17,103 +17,115 @@ namespace Ecxod\Symlink;
  */
 class symlink
 {
-    protected array $dist;
-    protected array $font;
-    protected array $icons;
-    protected array $jquery;
-    protected array $prismjs;
-    protected array $popperjs;
-    protected array $mathjax;
-    protected array $tinymce;
-    protected string $documentroot;
-    protected string $doxygenfolder;
-    protected string $staticfolder;
+    /**
+     * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
+     * @var array
+     */
+    protected array $dist, $font, $icons, $jquery, $prismjs, $popperjs, $mathjax, $tinymce;
+
+    /**
+     * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
+     * @var string
+     */
+    protected string $documentroot, $doxygenfolder, $staticfolder, $staticfolder_bs;
+    /**
+     * Das ist das unteste vereichnis im git/arbeitsbereich bereich
+     * @var string
+     */
+    protected string $workspace;
+
+    /**
+     * Das sind ordner die mit einem @ beginnen sollen wegen kompatibilität mit npm
+     * @var array
+     */
+    protected array $ordner_mit_kringel;
+
 
     function __construct()
     {
 
+        $this->ordner_mit_kringel = ["popperjs"];
+
         if (strval($_SERVER["SERVER_ADDR"]) === trim("192.168.178.6")) {
             $this->documentroot = strval(value: $_SERVER['DOCUMENT_ROOT']);
-        } elseif (strval($_SERVER["SERVER_ADDR"]) === trim("rufnummer-suche.de")) {
+        } else {
             $this->documentroot = "/httpdocs";
         }
-        
+
+        $this->workspace = strval(value: $this->documentroot . DIRECTORY_SEPARATOR . '../');
         $this->doxygenfolder =  $this->documentroot . DIRECTORY_SEPARATOR . 'doxygen';
         $this->staticfolder =  $this->documentroot . DIRECTORY_SEPARATOR . 'static';
-        $this->create_folder_if_not_exists(folder: $this->doxygenfolder);
-        $this->create_folder_if_not_exists(folder: $this->staticfolder);
         $this->staticfolder_bs =  $this->staticfolder . DIRECTORY_SEPARATOR . 'bs';
-        $this->create_folder_if_not_exists(folder: $this->staticfolder_bs);
+        $this->popperfolder =  $this->staticfolder . DIRECTORY_SEPARATOR . '@popperjs';
 
         if (is_dir(filename: $this->staticfolder) and !empty(realpath(path: $this->staticfolder))) {
-            $this->check_env_and_create_folder_if_not_exists(env: 'CSS');      // manual use
-            $this->check_env_and_create_folder_if_not_exists(env: 'PHCSS');    // manual use
-            $this->check_env_and_create_folder_if_not_exists(env: 'JS');       // manual use
-            $this->check_env_and_create_folder_if_not_exists(env: 'IMG');      // manual use
-            $this->check_env_and_create_folder_if_not_exists(env: 'MATHJAX');  // link
-            $this->check_env_and_create_folder_if_not_exists(env: 'POPPERJS'); // link
-            $this->check_env_and_create_folder_if_not_exists(env: 'PRISMJS');  // link
-            $this->check_env_and_create_folder_if_not_exists(env: 'TINYMCE');  // link
+            $this->check_env_and_create_folder_if_not_exists(env: 'FPOPPERJS');
+            $this->check_env_and_create_folder_if_not_exists(env: 'FBS');
+            $this->check_env_and_create_folder_if_not_exists(env: 'FCSS');
+            $this->check_env_and_create_folder_if_not_exists(env: 'FPHCSS');
+            $this->check_env_and_create_folder_if_not_exists(env: 'FJS');
+            $this->check_env_and_create_folder_if_not_exists(env: 'FIMG');
         } else {
             die("BAD PROBLEM : COULD NOT FIND THE STATIC FOLDERS");
         }
 
         $this->dist = [
-            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'bs/dist',
-            'target' => realpath(path: $this->documentroot . DIRECTORY_SEPARATOR . 'vendor/twbs/bootstrap/dist') . DIRECTORY_SEPARATOR
+            'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'dist',
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR . 'vendor/twbs/bootstrap/dist') . DIRECTORY_SEPARATOR
         ];
         $this->font = [
-            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'bs/font',
-            'target' => realpath(path:$this->documentroot . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/font') . DIRECTORY_SEPARATOR
+            'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'font',
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/font') . DIRECTORY_SEPARATOR
         ];
         $this->icons = [
-            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'bs/icons',
-            'target' => realpath(path: $this->documentroot . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/icons') . DIRECTORY_SEPARATOR
+            'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'icons',
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/icons') . DIRECTORY_SEPARATOR
         ];
         $this->jquery = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'jquery',
-            'target' => realpath(path: $this->documentroot . DIRECTORY_SEPARATOR  . 'node_modules/jquery/dist') . DIRECTORY_SEPARATOR
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/jquery/dist') . DIRECTORY_SEPARATOR
         ];
         $this->prismjs = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'prismjs',
-            'target' => realpath(path: $this->documentroot . DIRECTORY_SEPARATOR  . 'node_modules/prismjs') . DIRECTORY_SEPARATOR
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/prismjs') . DIRECTORY_SEPARATOR
         ];
         $this->mathjax = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'mathjax',
-            'target' => realpath(path: $this->documentroot . DIRECTORY_SEPARATOR  . 'node_modules/mathjax') . DIRECTORY_SEPARATOR
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/mathjax') . DIRECTORY_SEPARATOR
         ];
         $this->popperjs = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . '@popperjs/core',
-            'target' => realpath(path: $this->documentroot . DIRECTORY_SEPARATOR  . 'node_modules/@popperjs/core') . DIRECTORY_SEPARATOR
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/@popperjs/core') . DIRECTORY_SEPARATOR
         ];
         $this->tinymce = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'tinymce',
-            'target' => realpath(path: $this->documentroot . DIRECTORY_SEPARATOR  . 'node_modules/tinymce') . DIRECTORY_SEPARATOR
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/tinymce') . DIRECTORY_SEPARATOR
         ];
 
-        ($_ENV['DIST'] ? $this->create_symlink(link: $this->dist) : null);
-        ($_ENV['FONT'] ? $this->create_symlink(link: $this->font) : null);
-        ($_ENV['ICONS'] ? $this->create_symlink(link: $this->icons) : null);
-        ($_ENV['JQUERY'] ? $this->create_symlink(link: $this->jquery) : null);
-        ($_ENV['MATHJAX'] ? $this->create_symlink(link: $this->mathjax) : null);
-        ($_ENV['PRISMJS'] ? $this->create_symlink(link: $this->prismjs) : null);
-        ($_ENV['POPPERJS'] ? $this->create_symlink(link: $this->popperjs) : null);
-        ($_ENV['TINYMCE'] ? $this->create_symlink(link: $this->tinymce) : null);
+        ($_ENV['FDIST'] ? $this->create_symlink(link: $this->dist) : null);
+        ($_ENV['FFONT'] ? $this->create_symlink(link: $this->font) : null);
+        ($_ENV['FICONS'] ? $this->create_symlink(link: $this->icons) : null);
+        ($_ENV['FJQUERY'] ? $this->create_symlink(link: $this->jquery) : null);
+        ($_ENV['FMATHJAX'] ? $this->create_symlink(link: $this->mathjax) : null);
+        ($_ENV['FPRISMJS'] ? $this->create_symlink(link: $this->prismjs) : null);
+        ($_ENV['FPOPPERJS'] ? $this->create_symlink(link: $this->popperjs) : null);
+        ($_ENV['FTINYMCE'] ? $this->create_symlink(link: $this->tinymce) : null);
     }
 
     function check_env_and_create_folder_if_not_exists(string|bool $env = null, int $permissions = 0755): void
     {
-        if (isset($_ENV[$env]) and $_ENV[$env] === true) {
-            error_log($env);
-            $folder =  $this->staticfolder . DIRECTORY_SEPARATOR . strtolower($env);
-            error_log($folder);
-            $this->create_folder_if_not_exists(folder: $folder, permissions: $permissions);
+        if ($env === 'POPPERJS') {
+            $env = '@POPPERJS';
         }
+        if (isset($_ENV[$env]) and boolval($_ENV[$env]) === true) {
+            $folder =  $this->staticfolder . DIRECTORY_SEPARATOR . ltrim(strtolower($env), 'f');
+            $this->create_folder_if_not_exists(folder: $folder, permissions: $permissions);
+        };
     }
 
     function create_symlink(array $link): void
     {
-        // den link gibt es schon
+
         if (is_link(filename: $link['link']) and readlink(path: $link['link']) ===  $link['target']) {
             return;
         }
@@ -129,26 +141,54 @@ class symlink
             try {
                 symlink(target: $link['target'], link: $link['link']);
             } catch (\Throwable $e) {
-                error_log("+++++" . $link);
                 \Sentry\captureException($e);
             }
         }
     }
 
-    function create_folder_if_not_exists(string $folder, int $permissions = 0755): void
+    /** The method does 2 things :
+     * - create a folder if not exists
+     * - rename the _folder_ in _@folder_ if he is the ordner_mit_kringel array
+     * @param string $folder 
+     * @param int $permissions 
+     * @return void 
+     */
+    function create_folder_if_not_exists(string $folder = "", int $permissions = 0755): void
     {
-
-        if (!is_dir(filename: $folder) and empty(realpath(path: $folder))) {
-
-            if (!is_writable(filename: $_SERVER['DOCUMENT_ROOT'])) {
-                die('can\'t write to DOCUMENT_ROOT');
-            } else {
+        $dirname = dirname($folder);
+        foreach ($this->ordner_mit_kringel as $elem) {
+            $folder = strval($this->str_replace_last("/$elem", "/@$elem", $folder));
+            // wenn oben kein dirname war, probieren wir noch einmal
+            $dirname ??= dirname($folder);
+        }
+        // does the folder exist? if yes skip
+        if (!is_dir(filename: $folder) or empty(realpath(path: $folder))) {
+            // ist the parent writable ?
+            if (!empty($dirname) and is_dir(filename: $dirname) and is_writable(filename: $dirname)) {
                 try {
                     mkdir(directory: $folder, permissions: $permissions, recursive: true);
                 } catch (\Throwable $exception) {
                     \Sentry\captureException($exception);
                 }
+            } else {
+                echo "can't write to $dirname <bR>";
             }
         }
+    }
+
+
+    /** Replace the last occurence only
+     * @param string $search 
+     * @param string $replace 
+     * @param string|array $subject 
+     * @return string|array 
+     */
+    function str_replace_last(string $search, string $replace, array|string $subject): array|string
+    {
+        $pos = strrpos(haystack: $subject, needle: $search);
+        if ($pos !== false) {
+            $subject = substr_replace(string: $subject, replace: $replace, offset: $pos, length: strlen($search));
+        }
+        return $subject;
     }
 }
