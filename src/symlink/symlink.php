@@ -38,8 +38,6 @@ class symlink
             $this->documentroot = "/httpdocs";
         }
         
-        // /var/projekte/webroot/buchungssatz/public/static
-        $this->documentroot = strval(value: realpath(path: $_SERVER['DOCUMENT_ROOT']));
         $this->doxygenfolder =  $this->documentroot . DIRECTORY_SEPARATOR . 'doxygen';
         $this->staticfolder =  $this->documentroot . DIRECTORY_SEPARATOR . 'static';
         $this->create_folder_if_not_exists(folder: $this->doxygenfolder);
