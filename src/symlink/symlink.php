@@ -31,6 +31,13 @@ class symlink
 
     function __construct()
     {
+
+        if (strval($_SERVER["SERVER_ADDR"]) === trim("192.168.178.6")) {
+            $this->documentroot = strval(value: $_SERVER['DOCUMENT_ROOT']);
+        } elseif (strval($_SERVER["SERVER_ADDR"]) === trim("rufnummer-suche.de")) {
+            $this->documentroot = "/httpdocs";
+        }
+        
         // /var/projekte/webroot/buchungssatz/public/static
         $this->documentroot = strval(value: realpath(path: $_SERVER['DOCUMENT_ROOT']));
         $this->doxygenfolder =  $this->documentroot . DIRECTORY_SEPARATOR . 'doxygen';
@@ -53,40 +60,37 @@ class symlink
             die("BAD PROBLEM : COULD NOT FIND THE STATIC FOLDERS");
         }
 
-        // die('\$this->static=' . $this->static);
-
         $this->dist = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'bs/dist',
-            'target' => realpath(path: $_SERVER['DOCUMENT_ROOT'] . '/../vendor/twbs/bootstrap/dist') . DIRECTORY_SEPARATOR
+            'target' => realpath(path: $this->documentroot . DIRECTORY_SEPARATOR . 'vendor/twbs/bootstrap/dist') . DIRECTORY_SEPARATOR
         ];
-        // print_r($this->bs);die();
         $this->font = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'bs/font',
-            'target' => realpath(path: $_SERVER['DOCUMENT_ROOT'] . '/../vendor/twbs/bootstrap-icons/font') . DIRECTORY_SEPARATOR
+            'target' => realpath(path:$this->documentroot . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/font') . DIRECTORY_SEPARATOR
         ];
         $this->icons = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'bs/icons',
-            'target' => realpath(path: $_SERVER['DOCUMENT_ROOT'] . '/../vendor/twbs/bootstrap-icons/icons') . DIRECTORY_SEPARATOR
+            'target' => realpath(path: $this->documentroot . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/icons') . DIRECTORY_SEPARATOR
         ];
         $this->jquery = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'jquery',
-            'target' => realpath(path: $_SERVER['DOCUMENT_ROOT'] . '/../node_modules/jquery/dist') . DIRECTORY_SEPARATOR
+            'target' => realpath(path: $this->documentroot . DIRECTORY_SEPARATOR  . 'node_modules/jquery/dist') . DIRECTORY_SEPARATOR
         ];
         $this->prismjs = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'prismjs',
-            'target' => realpath(path: $_SERVER['DOCUMENT_ROOT'] . '/../node_modules/prismjs') . DIRECTORY_SEPARATOR
+            'target' => realpath(path: $this->documentroot . DIRECTORY_SEPARATOR  . 'node_modules/prismjs') . DIRECTORY_SEPARATOR
         ];
         $this->mathjax = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'mathjax',
-            'target' => realpath(path: $_SERVER['DOCUMENT_ROOT'] . '/../node_modules/mathjax') . DIRECTORY_SEPARATOR
+            'target' => realpath(path: $this->documentroot . DIRECTORY_SEPARATOR  . 'node_modules/mathjax') . DIRECTORY_SEPARATOR
         ];
         $this->popperjs = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . '@popperjs/core',
-            'target' => realpath(path: $_SERVER['DOCUMENT_ROOT'] . '/../node_modules/@popperjs/core') . DIRECTORY_SEPARATOR
+            'target' => realpath(path: $this->documentroot . DIRECTORY_SEPARATOR  . 'node_modules/@popperjs/core') . DIRECTORY_SEPARATOR
         ];
         $this->tinymce = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'tinymce',
-            'target' => realpath(path: $_SERVER['DOCUMENT_ROOT'] . '/../node_modules/tinymce') . DIRECTORY_SEPARATOR
+            'target' => realpath(path: $this->documentroot . DIRECTORY_SEPARATOR  . 'node_modules/tinymce') . DIRECTORY_SEPARATOR
         ];
 
         ($_ENV['DIST'] ? $this->create_symlink(link: $this->dist) : null);
