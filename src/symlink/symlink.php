@@ -81,10 +81,6 @@ class symlink
             'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'icons',
             'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/icons') . DIRECTORY_SEPARATOR
         ];
-        $this->chartjs = [
-            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'chart.js',
-            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/chart.js') . DIRECTORY_SEPARATOR
-        ];
         $this->jquery = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'jquery',
             'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/jquery/dist') . DIRECTORY_SEPARATOR
@@ -104,6 +100,10 @@ class symlink
         $this->tinymce = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'tinymce',
             'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/tinymce') . DIRECTORY_SEPARATOR
+        ];
+        $this->chartjs = [
+            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'chartjs',
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/chartjs') . DIRECTORY_SEPARATOR
         ];
 
         ($_ENV['FDIST'] ? $this->create_symlink(link: $this->dist) : null);
