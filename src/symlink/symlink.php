@@ -21,7 +21,7 @@ class symlink
      * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
      * @var array
      */
-    protected array $dist, $font, $icons, $jquery, $prismjs, $popperjs, $mathjax, $tinymce;
+    protected array $chartjs, $dist, $font, $icons, $jquery, $prismjs, $popperjs, $mathjax, $tinymce;
 
     /**
      * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
@@ -81,6 +81,10 @@ class symlink
             'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'icons',
             'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/icons') . DIRECTORY_SEPARATOR
         ];
+        $this->chartjs = [
+            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'chart.js',
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/chart.js') . DIRECTORY_SEPARATOR
+        ];
         $this->jquery = [
             'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'jquery',
             'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/jquery/dist') . DIRECTORY_SEPARATOR
@@ -110,6 +114,7 @@ class symlink
         ($_ENV['FPRISMJS'] ? $this->create_symlink(link: $this->prismjs) : null);
         ($_ENV['FPOPPERJS'] ? $this->create_symlink(link: $this->popperjs) : null);
         ($_ENV['FTINYMCE'] ? $this->create_symlink(link: $this->tinymce) : null);
+        ($_ENV['FCHARTJS'] ? $this->create_symlink(link: $this->chartjs) : null);
     }
 
     function check_env_and_create_folder_if_not_exists(string|bool $env = null, int $permissions = 0755): void
