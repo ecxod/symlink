@@ -21,13 +21,26 @@ class symlink
      * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
      * @var array
      */
-    protected array $chartjs, $dist, $font, $icons, $jquery, $prismjs, $popperjs, $mathjax, $tinymce;
+    protected array $chartjs,
+        $dist,
+        $font,
+        $icons,
+        $jquery,
+        $prismjs,
+        $popperjs,
+        $mathjax,
+        $tinymce;
 
     /**
      * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
      * @var string
      */
-    protected string $documentroot, $doxygenfolder, $staticfolder, $staticfolder_bs;
+    protected string $documentroot,
+        $doxygenfolder,
+        $staticfolder,
+        $staticfolder_bs,
+        $popperfolder;
+
     /**
      * Das ist das unteste vereichnis im git/arbeitsbereich bereich
      * @var string
@@ -46,11 +59,11 @@ class symlink
 
         $this->ordner_mit_kringel = ["popperjs"];
 
-        if (strval($_SERVER["SERVER_ADDR"]) === trim($_ENV['BLACK_IP'])) {
+        if (isset($_ENV['BLACK_IP']) and strval($_SERVER["SERVER_ADDR"]) === trim($_ENV['BLACK_IP'])) {
             $this->documentroot = strval(value: $_SERVER['DOCUMENT_ROOT']);
         } else {
-            die("UNDOCUMENTED IP");
             $this->documentroot = "/httpdocs";
+            die("UNDOCUMENTED IP");
         }
 
         $this->workspace = strval(value: $this->documentroot . DIRECTORY_SEPARATOR . '../');
