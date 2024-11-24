@@ -46,9 +46,10 @@ class symlink
 
         $this->ordner_mit_kringel = ["popperjs"];
 
-        if (strval($_SERVER["SERVER_ADDR"]) === trim("192.168.178.6")) {
+        if (strval($_SERVER["SERVER_ADDR"]) === trim($_ENV['BLACK_IP'])) {
             $this->documentroot = strval(value: $_SERVER['DOCUMENT_ROOT']);
         } else {
+            die("UNDOCUMENTED IP");
             $this->documentroot = "/httpdocs";
         }
 
