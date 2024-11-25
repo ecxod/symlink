@@ -101,7 +101,7 @@ class symlink
             die("BAD PROBLEM : COULD NOT FIND THE STATIC FOLDERS");
         }
 
-        if ($this->installedLibraries["twbs/bootstrap"] and $this->checkLibraryInstallation(library: "twbs/bootstrap")) {
+        if (in_array("twbs/bootstrap", $this->installedLibraries) and $this->checkLibraryInstallation(library: "twbs/bootstrap")) {
             $this->dist = [
                 'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'dist',
                 'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR . 'vendor/twbs/bootstrap/dist') . DIRECTORY_SEPARATOR
@@ -110,7 +110,7 @@ class symlink
             $this->dist = [];
         }
 
-        if ($this->installedLibraries["twbs/bootstrap-icons"] and $this->checkLibraryInstallation(library: "twbs/bootstrap-icons")) {
+        if (in_array("twbs/bootstrap-icons", $this->installedLibraries) and $this->checkLibraryInstallation(library: "twbs/bootstrap-icons")) {
             $this->font = [
                 'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'font',
                 'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/font') . DIRECTORY_SEPARATOR
@@ -124,7 +124,7 @@ class symlink
             $this->icons = [];
         }
 
-        if ($this->installedLibraries["jquery"] and $this->checkLibraryInstallation(library: "jquery")) {
+        if (in_array("jquery", $this->installedLibraries) and $this->checkLibraryInstallation(library: "jquery")) {
             $this->jquery = [
                 'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'jquery',
                 'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/jquery/dist') . DIRECTORY_SEPARATOR
@@ -133,7 +133,7 @@ class symlink
             $this->jquery = [];
         }
 
-        if ($this->installedLibraries["prismjs"] and $this->checkLibraryInstallation(library: "prismjs")) {
+        if (in_array("prismjs", $this->installedLibraries) and $this->checkLibraryInstallation(library: "prismjs")) {
             $this->prismjs = [
                 'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'prismjs',
                 'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/prismjs') . DIRECTORY_SEPARATOR
@@ -142,7 +142,8 @@ class symlink
             $this->prismjs = [];
         }
 
-        if ($this->installedLibraries["mathjax"] and $this->checkLibraryInstallation(library: "mathjax")) {
+
+        if (in_array("mathjax", $this->installedLibraries) and $this->checkLibraryInstallation(library: "mathjax")) {
             $this->mathjax = [
                 'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'mathjax',
                 'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/mathjax') . DIRECTORY_SEPARATOR
@@ -151,7 +152,7 @@ class symlink
             $this->mathjax = [];
         }
 
-        if ($this->installedLibraries["@popperjs"] and $this->checkLibraryInstallation(library: "@popperjs")) {
+        if (in_array("@popperjs", $this->installedLibraries) and $this->checkLibraryInstallation(library: "@popperjs")) {
             $this->popperjs = [
                 'link' => $this->staticfolder . DIRECTORY_SEPARATOR . '@popperjs/core',
                 'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/@popperjs/core') . DIRECTORY_SEPARATOR
@@ -160,7 +161,7 @@ class symlink
             $this->popperjs = [];
         }
 
-        if ($this->installedLibraries["tinymce"] and $this->checkLibraryInstallation(library: "tinymce")) {
+        if (in_array("tinymce", $this->installedLibraries) and $this->checkLibraryInstallation(library: "tinymce")) {
             $this->tinymce = [
                 'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'tinymce',
                 'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/tinymce') . DIRECTORY_SEPARATOR
@@ -169,7 +170,7 @@ class symlink
             $this->tinymce = [];
         }
 
-        if ($this->installedLibraries["chartjs"] and $this->checkLibraryInstallation(library: "chartjs")) {
+        if (in_array("chartjs", $this->installedLibraries) and $this->checkLibraryInstallation(library: "chartjs")) {
             $this->chartjs = [
                 'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'chartjs',
                 'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/chartjs') . DIRECTORY_SEPARATOR
