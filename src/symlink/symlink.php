@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ecxod\Symlink;
 
+use function Ecxod\Funktionen\{m, logg, addIfNotExists};
+
 /** 
  * IMPORTANT : 
  * To grant write and execute permissions on the /raid/home/christian/wdrive/buchungssatz/public/static 
@@ -14,6 +16,8 @@ namespace Ecxod\Symlink;
  * christian@black:/raid/home/christian/wdrive/buchungssatz $ npm install jquery
  * 
  * @package symlink 
+ * @author Christian Eichert <c@zp1.net>
+ * @version 1.0.0
  */
 class symlink
 {
@@ -35,17 +39,13 @@ class symlink
      * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
      * @var string
      */
-    protected string $documentroot,
+    protected string
+        $workspace,
+        $documentroot,
         $doxygenfolder,
         $staticfolder,
         $staticfolder_bs,
         $popperfolder;
-
-    /**
-     * Das ist das unteste vereichnis im git/arbeitsbereich bereich
-     * @var string
-     */
-    protected string $workspace;
 
     /**
      * Das sind ordner die mit einem @ beginnen sollen wegen kompatibilität mit npm
@@ -53,12 +53,26 @@ class symlink
      */
     protected array $ordner_mit_kringel;
 
+    /**
+     * 
+     * @return void 
+     */
+    protected array $installedLibraries;
 
+
+    /** 
+     * @return void
+     * @author Christian Eichert <c@zp1.net>
+     * @version 1.0.0
+     */
     function __construct()
     {
+        // clearing array installedLibraries
+        $this->installedLibraries = [];
 
         $this->ordner_mit_kringel = ["popperjs"];
 
+        // TODO: da muss fuer jeden server eine option rein oder entsprechend konfigurieren
         if (isset($_ENV['BLACK_IP']) and strval($_SERVER["SERVER_ADDR"]) === trim($_ENV['BLACK_IP'])) {
             $this->documentroot = strval(value: $_SERVER['DOCUMENT_ROOT']);
         } else {
@@ -69,7 +83,11 @@ class symlink
         $this->workspace = strval(value: $this->documentroot . DIRECTORY_SEPARATOR . '../');
         $this->doxygenfolder =  $this->documentroot . DIRECTORY_SEPARATOR . 'doxygen';
         $this->staticfolder =  $this->documentroot . DIRECTORY_SEPARATOR . 'static';
-        $this->staticfolder_bs =  $this->staticfolder . DIRECTORY_SEPARATOR . 'bs';
+
+        if ($this->installedLibraries["twbs/bootstrap"] and $this->checkLibraryInstallation("twbs/bootstrap")) {
+            $this->staticfolder_bs =  $this->staticfolder . DIRECTORY_SEPARATOR . 'bs';
+        }
+
         $this->popperfolder =  $this->staticfolder . DIRECTORY_SEPARATOR . '@popperjs';
 
         if (is_dir(filename: $this->staticfolder) and !empty(realpath(path: $this->staticfolder))) {
@@ -83,52 +101,93 @@ class symlink
             die("BAD PROBLEM : COULD NOT FIND THE STATIC FOLDERS");
         }
 
-        $this->dist = [
-            'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'dist',
-            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR . 'vendor/twbs/bootstrap/dist') . DIRECTORY_SEPARATOR
-        ];
-        $this->font = [
-            'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'font',
-            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/font') . DIRECTORY_SEPARATOR
-        ];
-        $this->icons = [
-            'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'icons',
-            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/icons') . DIRECTORY_SEPARATOR
-        ];
-        $this->jquery = [
-            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'jquery',
-            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/jquery/dist') . DIRECTORY_SEPARATOR
-        ];
-        $this->prismjs = [
-            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'prismjs',
-            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/prismjs') . DIRECTORY_SEPARATOR
-        ];
-        $this->mathjax = [
-            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'mathjax',
-            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/mathjax') . DIRECTORY_SEPARATOR
-        ];
-        $this->popperjs = [
-            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . '@popperjs/core',
-            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/@popperjs/core') . DIRECTORY_SEPARATOR
-        ];
-        $this->tinymce = [
-            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'tinymce',
-            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/tinymce') . DIRECTORY_SEPARATOR
-        ];
-        $this->chartjs = [
-            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'chartjs',
-            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/chartjs') . DIRECTORY_SEPARATOR
-        ];
+        if ($this->installedLibraries["twbs/bootstrap"] and $this->checkLibraryInstallation(library: "twbs/bootstrap")) {
+            $this->dist = [
+                'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'dist',
+                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR . 'vendor/twbs/bootstrap/dist') . DIRECTORY_SEPARATOR
+            ];
+        } else {
+            $this->dist = [];
+        }
 
-        ($_ENV['FDIST'] ? $this->create_symlink(link: $this->dist) : null);
-        ($_ENV['FFONT'] ? $this->create_symlink(link: $this->font) : null);
-        ($_ENV['FICONS'] ? $this->create_symlink(link: $this->icons) : null);
-        ($_ENV['FJQUERY'] ? $this->create_symlink(link: $this->jquery) : null);
-        ($_ENV['FMATHJAX'] ? $this->create_symlink(link: $this->mathjax) : null);
-        ($_ENV['FPRISMJS'] ? $this->create_symlink(link: $this->prismjs) : null);
-        ($_ENV['FPOPPERJS'] ? $this->create_symlink(link: $this->popperjs) : null);
-        ($_ENV['FTINYMCE'] ? $this->create_symlink(link: $this->tinymce) : null);
-        ($_ENV['FCHARTJS'] ? $this->create_symlink(link: $this->chartjs) : null);
+        if ($this->installedLibraries["twbs/bootstrap-icons"] and $this->checkLibraryInstallation(library: "twbs/bootstrap-icons")) {
+            $this->font = [
+                'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'font',
+                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/font') . DIRECTORY_SEPARATOR
+            ];
+            $this->icons = [
+                'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'icons',
+                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/icons') . DIRECTORY_SEPARATOR
+            ];
+        } else {
+            $this->font = [];
+            $this->icons = [];
+        }
+
+        if ($this->installedLibraries["jquery"] and $this->checkLibraryInstallation(library: "jquery")) {
+            $this->jquery = [
+                'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'jquery',
+                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/jquery/dist') . DIRECTORY_SEPARATOR
+            ];
+        } else {
+            $this->jquery = [];
+        }
+
+        if ($this->installedLibraries["prismjs"] and $this->checkLibraryInstallation(library: "prismjs")) {
+            $this->prismjs = [
+                'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'prismjs',
+                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/prismjs') . DIRECTORY_SEPARATOR
+            ];
+        } else {
+            $this->prismjs = [];
+        }
+
+        if ($this->installedLibraries["mathjax"] and $this->checkLibraryInstallation(library: "mathjax")) {
+            $this->mathjax = [
+                'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'mathjax',
+                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/mathjax') . DIRECTORY_SEPARATOR
+            ];
+        } else {
+            $this->mathjax = [];
+        }
+
+        if ($this->installedLibraries["@popperjs"] and $this->checkLibraryInstallation(library: "@popperjs")) {
+            $this->popperjs = [
+                'link' => $this->staticfolder . DIRECTORY_SEPARATOR . '@popperjs/core',
+                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/@popperjs/core') . DIRECTORY_SEPARATOR
+            ];
+        } else {
+            $this->popperjs = [];
+        }
+
+        if ($this->installedLibraries["tinymce"] and $this->checkLibraryInstallation(library: "tinymce")) {
+            $this->tinymce = [
+                'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'tinymce',
+                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/tinymce') . DIRECTORY_SEPARATOR
+            ];
+        } else {
+            $this->tinymce = [];
+        }
+
+        if ($this->installedLibraries["chartjs"] and $this->checkLibraryInstallation(library: "chartjs")) {
+            $this->chartjs = [
+                'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'chartjs',
+                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/chartjs') . DIRECTORY_SEPARATOR
+            ];
+        } else {
+            $this->chartjs = [];
+        }
+
+        (empty($this->dist) ? null : $this->create_symlink(link: $this->dist));
+        (empty($this->font) ? null : $this->create_symlink(link: $this->font));
+        (empty($this->icons) ? null : $this->create_symlink(link: $this->icons));
+
+        (empty($this->jquery) ? null : $this->create_symlink(link: $this->jquery));
+        (empty($this->mathjax) ? null : $this->create_symlink(link: $this->mathjax));
+        (empty($this->prismjs) ? null : $this->create_symlink(link: $this->prismjs));
+        (empty($this->popperjs) ? null : $this->create_symlink(link: $this->popperjs));
+        (empty($this->tinymce) ? null : $this->create_symlink(link: $this->tinymce));
+        (empty($this->chartjs) ? null : $this->create_symlink(link: $this->chartjs));
     }
 
     function check_env_and_create_folder_if_not_exists(string|bool $env = null, int $permissions = 0755): void
@@ -160,6 +219,7 @@ class symlink
             try {
                 symlink(target: $link['target'], link: $link['link']);
             } catch (\Throwable $e) {
+                logg($e);
                 \Sentry\captureException($e);
             }
         }
@@ -209,5 +269,61 @@ class symlink
             $subject = substr_replace(string: $subject, replace: $replace, offset: $pos, length: strlen($search));
         }
         return $subject;
+    }
+
+    /** 
+     * Checks if a PHP Library is installed in **vendor** and is also required in **composer.json**  
+     * returns *true* if installed and *false* if not installed
+     * 
+     * @param string $library 
+     * @param string $composerFile 
+     * @param string $vendor 
+     * @return bool 
+     */
+    function checkLibraryInstallation(
+        string $library = "twbs/bootstrap",
+        string $composerFile = "composer.json", // relative path to the composer/package-lock file
+        string $vendor = "vendor"
+    ): bool {
+
+        $composerFileArr = ["composer.json", "package.json"];
+        $vendorArr = ["vendor", "node_modules"];
+
+        if (in_array($vendor, $vendorArr) and in_array($composerFile, $composerFileArr)) {
+            die("Can't check Libraries");
+        }
+
+        $vendorDir = "$vendor/$library";
+        $isLibraryRequired = false;
+        $isLibraryInstalled = false;
+
+        // Check if Library is listed in composer.json
+        if (file_exists($composerFile) and $composerFile === "composer.json") {
+            $composerContent = json_decode(file_get_contents($composerFile), true);
+            $isLibraryRequired = isset($composerContent['require'][$library]);
+            // Check if Library is listed in package.json
+        } elseif (file_exists($composerFile) and $composerFile === "package.json") {
+            $composerContent = json_decode(file_get_contents($composerFile), true);
+            $isLibraryRequired = isset($composerContent['dependencies'][$library]);
+        } else {
+            $isLibraryRequired = false;
+        }
+
+        // Check if the Bootstrap directory exists and is not empty
+        $isLibraryInstalled = is_dir($vendorDir) && (new \FilesystemIterator($vendorDir))->valid();
+
+        // conclusion
+        if ($isLibraryRequired && $isLibraryInstalled) {
+            if (function_exists('logg')) {
+                logg("### $library is installed.");
+            }
+            addIfNotExists($this->installedLibraries, $library);
+            return true;
+        } else {
+            if (function_exists('logg')) {
+                logg("### $library is not installed.");
+            }
+            return false;
+        }
     }
 }
