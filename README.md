@@ -1,6 +1,6 @@
 # Ecxod\Symlink\symlink
 
-```
+```sh
 php composer.phar require vlucas/phpdotenv
 npm i jquery
 npm i mathjax
@@ -10,12 +10,16 @@ npm i popperjs
 
 cat .env
 
-```env
-$_ENV['dist'] = false
-$_ENV['font'] = false
-$_ENV['icons'] = false
-$_ENV['jquery'] = false
-$_ENV['mathjax'] = false
-$_ENV['prismjs'] = false
-$_ENV['popperjs'] = false
+```sh
+PROJECT_PATH="... /webroot/project"
+PUBLIC=="... /webroot/project/public"
+STATIC="static"
+CSS="static/css/"
+# CSS_PATH="... /webroot/project/public/static/css/"
+PHCSS="static/phcss"
+# PHCSS_PATH="... /webroot/project/public/static/phcss"
+JS="static/js/"
+# JS_PATH=".../webroot/project/public/static/js/"
+PIC="static/pic"
+IMG="static/img"
 ```
