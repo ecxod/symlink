@@ -1,6 +1,8 @@
 # Ecxod\Symlink\symlink
 
 ```sh
+php composer.phar require twbs/bootstrap
+php composer.phar require twbs/bootstrap-icons
 php composer.phar require vlucas/phpdotenv
 npm i jquery
 npm i mathjax
