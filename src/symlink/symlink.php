@@ -25,7 +25,7 @@ class symlink
      * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
      * @var array
      */
-    protected array 
+    protected array
         $chartjs,
         $dist,
         $font,
@@ -52,7 +52,7 @@ class symlink
      * Das sind ordner die mit einem @ beginnen sollen wegen kompatibilität mit npm
      * @var array
      */
-    protected array 
+    protected array
         $ordner_mit_kringel;
 
     /** 
@@ -69,6 +69,8 @@ class symlink
         if (isset($_ENV['BLACK_IP']) and strval($_SERVER["SERVER_ADDR"]) === trim($_ENV['BLACK_IP'])) {
             $this->documentroot = realpath(strval(value: $_SERVER['DOCUMENT_ROOT']));
             // echo $this->documentroot;
+        } elseif (isset($_SERVER["SERVER_ADDR"]) and in_array(needle: $_SERVER["SERVER_ADDR"], haystack: explode(separator: ",", string: $_SERVER["SERVER_ARR"]), strict: true)) {
+            $this->documentroot = realpath(strval(value: $_SERVER['DOCUMENT_ROOT']));
         } else {
             $this->documentroot = "/httpdocs";
             die("UNDOCUMENTED IP");
@@ -83,8 +85,7 @@ class symlink
         $this->create_folder_if_not_exists($this->staticfolder);
 
         // TODO: es gibt ordner in env die sollten von einer function erzeugt werden
-        
-        $this->check_and_create_folder_if_not_exists(folder: '@popperjs',library: "@popperjs", composerFile: "package.json", vendor: "node_modules");
+        $this->check_and_create_folder_if_not_exists(folder: '@popperjs', library: "@popperjs", composerFile: "package.json", vendor: "node_modules");
         $this->check_and_create_folder_if_not_exists(folder: "bs", library: "twbs/bootstrap", composerFile: "composer.json", vendor: "vendor");
         $this->check_and_create_folder_if_not_exists(folder: "css");
         $this->check_and_create_folder_if_not_exists(folder: 'phcss');
