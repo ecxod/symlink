@@ -62,6 +62,8 @@ class symlink
      */
     function __construct()
     {
+        $this->documentroot = "";
+
         // TODO: was sind Ordner mit Kringel ?
         $this->ordner_mit_kringel = ["popperjs"];
 
@@ -69,11 +71,13 @@ class symlink
         if (isset($_ENV['BLACK_IP']) and strval($_SERVER["SERVER_ADDR"]) === trim($_ENV['BLACK_IP'])) {
             $this->documentroot = realpath(strval(value: $_SERVER['DOCUMENT_ROOT']));
             // echo $this->documentroot;
-        } elseif (isset($_SERVER["SERVER_ADDR"]) and in_array(needle: $_SERVER["SERVER_ADDR"], haystack: explode(separator: ",", string: $_SERVER["SERVER_ARR"]), strict: true)) {
+        } elseif (!empty($_SERVER["SERVER_ADDR"]) and in_array(needle: $_SERVER["SERVER_ADDR"], haystack: explode(separator: ",", string: $_SERVER["SERVER_ARR"]), strict: true)) {
             $this->documentroot = realpath(strval(value: $_SERVER['DOCUMENT_ROOT']));
         } else {
-            $this->documentroot = "/httpdocs";
             die("UNDOCUMENTED IP");
+        }
+        if (empty($this->documentroot)) {
+            die("UNDOCUMENTED ROOT");
         }
 
         $this->workspace = realpath(strval(value: $this->documentroot . DIRECTORY_SEPARATOR . '../'));
