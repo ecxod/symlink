@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ecxod\Symlink;
 
+use \FilesystemIterator;
 use function Ecxod\Funktionen\{m, logg, addIfNotExists};
 
 /** 
@@ -60,7 +61,7 @@ class symlink
      * @author Christian Eichert <c@zp1.net>
      * @version 1.0.0
      */
-    function __construct()
+    public function __construct()
     {
         $this->documentroot = "";
 
@@ -71,7 +72,7 @@ class symlink
         if (isset($_ENV['BLACK_IP']) and strval($_SERVER["SERVER_ADDR"]) === trim($_ENV['BLACK_IP'])) {
             $this->documentroot = realpath(strval(value: $_SERVER['DOCUMENT_ROOT']));
             // echo $this->documentroot;
-        } elseif (!empty($_SERVER["SERVER_ADDR"]) and in_array(needle: $_SERVER["SERVER_ADDR"], haystack: explode(separator: ",", string: $_SERVER["SERVER_ARR"]), strict: true)) {
+        } elseif (!empty($_SERVER["SERVER_ADDR"]) and in_array(needle: $_SERVER["SERVER_ADDR"], haystack: explode(separator: ",", string: $_ENV["SERVER_ARR"]), strict: true)) {
             $this->documentroot = realpath(strval(value: $_SERVER['DOCUMENT_ROOT']));
         } else {
             die("UNDOCUMENTED IP");
@@ -80,13 +81,13 @@ class symlink
             die("UNDOCUMENTED ROOT");
         }
 
-        $this->workspace = realpath(strval(value: $this->documentroot . DIRECTORY_SEPARATOR . '../'));
-        $this->doxygenfolder =  $this->documentroot . DIRECTORY_SEPARATOR . 'doxygen';
-        $this->staticfolder =  $this->documentroot . DIRECTORY_SEPARATOR . 'static';
-        $this->staticfolder_bs =  $this->staticfolder . DIRECTORY_SEPARATOR . 'bs';
+        $this->workspace = realpath(path: strval(value: $this->documentroot . DIRECTORY_SEPARATOR . '../'));
+        $this->doxygenfolder = $this->documentroot . DIRECTORY_SEPARATOR . 'doxygen';
+        $this->staticfolder = $this->documentroot . DIRECTORY_SEPARATOR . 'static';
+        $this->staticfolder_bs = $this->staticfolder . DIRECTORY_SEPARATOR . 'bs';
 
-        $this->create_folder_if_not_exists($this->doxygenfolder);
-        $this->create_folder_if_not_exists($this->staticfolder);
+        $this->create_folder_if_not_exists(folder: $this->doxygenfolder);
+        $this->create_folder_if_not_exists(folder: $this->staticfolder);
 
         // TODO: es gibt ordner in env die sollten von einer function erzeugt werden
         $this->check_and_create_folder_if_not_exists(folder: '@popperjs', library: "@popperjs", composerFile: "package.json", vendor: "node_modules");
@@ -96,84 +97,50 @@ class symlink
         $this->check_and_create_folder_if_not_exists(folder: 'js');
         $this->check_and_create_folder_if_not_exists(folder: 'img');
 
-        if ($this->checkLibraryInstallation(library: "twbs/bootstrap", composerFile: "composer.json", vendor: "vendor")) {
-            $this->dist = [
-                'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'dist',
-                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR . 'vendor/twbs/bootstrap/dist') . DIRECTORY_SEPARATOR
-            ];
-        } else {
-            error_log("twbs/bootstrap is not in vendor\n");
-            $this->dist = [];
-        }
+        $this->dist = ($this->checkLibraryInstallation(library: "twbs/bootstrap", composerFile: "composer.json", vendor: "vendor")) ? [
+            'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'dist',
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR . 'vendor/twbs/bootstrap/dist') . DIRECTORY_SEPARATOR
+        ] : [];
 
-        if ($this->checkLibraryInstallation(library: "twbs/bootstrap-icons", composerFile: "composer.json", vendor: "vendor")) {
-            $this->font = [
-                'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'font',
-                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/font') . DIRECTORY_SEPARATOR
-            ];
-            $this->icons = [
-                'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'icons',
-                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'vendor/twbs/bootstrap-icons/icons') . DIRECTORY_SEPARATOR
-            ];
-        } else {
-            error_log("twbs/bootstrap-icons is not in vendor");
-            $this->font = [];
-            $this->icons = [];
-        }
+        $this->font = ($this->checkLibraryInstallation(library: "twbs/bootstrap-icons", composerFile: "composer.json", vendor: "vendor")) ? [
+            'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'font',
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR . 'vendor/twbs/bootstrap-icons/font') . DIRECTORY_SEPARATOR
+        ] : [];
 
-        if ($this->checkLibraryInstallation(library: "jquery", composerFile: "package.json", vendor: "node_modules")) {
-            $this->jquery = [
-                'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'jquery',
-                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/jquery/dist') . DIRECTORY_SEPARATOR
-            ];
-        } else {
-            $this->jquery = [];
-        }
+        $this->icons = ($this->checkLibraryInstallation(library: "twbs/bootstrap-icons", composerFile: "composer.json", vendor: "vendor")) ? [
+            'link' => $this->staticfolder_bs . DIRECTORY_SEPARATOR . 'icons',
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR . 'vendor/twbs/bootstrap-icons/icons') . DIRECTORY_SEPARATOR
+        ] : [];
 
-        if ($this->checkLibraryInstallation(library: "prismjs", composerFile: "package.json", vendor: "node_modules")) {
-            $this->prismjs = [
-                'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'prismjs',
-                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/prismjs') . DIRECTORY_SEPARATOR
-            ];
-        } else {
-            $this->prismjs = [];
-        }
+        $this->jquery = ($this->checkLibraryInstallation(library: "jquery", composerFile: "package.json", vendor: "node_modules")) ? [
+            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'jquery',
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR . 'node_modules/jquery/dist') . DIRECTORY_SEPARATOR
+        ] : [];
 
-        if ($this->checkLibraryInstallation(library: "mathjax", composerFile: "package.json", vendor: "node_modules")) {
-            $this->mathjax = [
-                'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'mathjax',
-                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/mathjax') . DIRECTORY_SEPARATOR
-            ];
-        } else {
-            $this->mathjax = [];
-        }
+        $this->prismjs = ($this->checkLibraryInstallation(library: "prismjs", composerFile: "package.json", vendor: "node_modules")) ? [
+            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'prismjs',
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR . 'node_modules/prismjs') . DIRECTORY_SEPARATOR
+        ] : [];
 
-        if ($this->checkLibraryInstallation(library: "@popperjs", composerFile: "package.json", vendor: "node_modules")) {
-            $this->popperjs = [
-                'link' => $this->staticfolder . DIRECTORY_SEPARATOR . '@popperjs/core',
-                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/@popperjs/core') . DIRECTORY_SEPARATOR
-            ];
-        } else {
-            $this->popperjs = [];
-        }
+        $this->mathjax = ($this->checkLibraryInstallation(library: "mathjax", composerFile: "package.json", vendor: "node_modules")) ? [
+            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'mathjax',
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR . 'node_modules/mathjax') . DIRECTORY_SEPARATOR
+        ] : [];
 
-        if ($this->checkLibraryInstallation(library: "tinymce", composerFile: "package.json", vendor: "node_modules")) {
-            $this->tinymce = [
-                'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'tinymce',
-                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/tinymce') . DIRECTORY_SEPARATOR
-            ];
-        } else {
-            $this->tinymce = [];
-        }
+        $this->popperjs = ($this->checkLibraryInstallation(library: "@popperjs", composerFile: "package.json", vendor: "node_modules")) ? [
+            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . '@popperjs/core',
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR . 'node_modules/@popperjs/core') . DIRECTORY_SEPARATOR
+        ] : [];
 
-        if ($this->checkLibraryInstallation(library: "chartjs", composerFile: "package.json", vendor: "node_modules")) {
-            $this->chartjs = [
-                'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'chartjs',
-                'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR  . 'node_modules/chartjs') . DIRECTORY_SEPARATOR
-            ];
-        } else {
-            $this->chartjs = [];
-        }
+        $this->tinymce = ($this->checkLibraryInstallation(library: "tinymce", composerFile: "package.json", vendor: "node_modules")) ? [
+            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'tinymce',
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR . 'node_modules/tinymce') . DIRECTORY_SEPARATOR
+        ] : [];
+
+        $this->chartjs = ($this->checkLibraryInstallation(library: "chartjs", composerFile: "package.json", vendor: "node_modules")) ? [
+            'link' => $this->staticfolder . DIRECTORY_SEPARATOR . 'chartjs',
+            'target' => realpath(path: $this->workspace . DIRECTORY_SEPARATOR . 'node_modules/chartjs') . DIRECTORY_SEPARATOR
+        ] : [];
 
         (empty($this->dist) ? null : $this->create_symlink(link: $this->dist));
         (empty($this->font) ? null : $this->create_symlink(link: $this->font));
@@ -186,11 +153,21 @@ class symlink
         (empty($this->chartjs) ? null : $this->create_symlink(link: $this->chartjs));
     }
 
-    function check_and_create_folder_if_not_exists(
+    /**
+     * @param string $folder 
+     * @param string|null $library 
+     * @param string|null $composerFile 
+     * @param string|null $vendor 
+     * @param int $permissions 
+     * @return void 
+     * @author Christian Eichert <c@zp1.net>
+     * @version 1.0.0
+     */
+    public function check_and_create_folder_if_not_exists(
         string $folder,
-        string $library = NULL,
-        string $composerFile = NULL,
-        string $vendor = NULL,
+        string $library = null,
+        string $composerFile = null,
+        string $vendor = null,
         int $permissions = 0755
     ): void {
 
@@ -200,17 +177,24 @@ class symlink
 
         /** Wir machen den Folder weil es eine Library ist */
         if (!empty($folder) and !empty($library) and !empty($composerFile) and !empty($vendor) and $this->checkLibraryInstallation($library, $composerFile, $vendor)) {
-            $completefolder =  $this->staticfolder . DIRECTORY_SEPARATOR . ltrim(strtolower($folder), 'f');
+            $completefolder = $this->staticfolder . DIRECTORY_SEPARATOR . ltrim(string: strtolower(string: $folder), characters: 'f');
             $this->create_folder_if_not_exists(folder: $completefolder, permissions: $permissions);
             /** Wir machen den Ordner sowieso auch wenn keine Library */
         } elseif (!empty($folder) and empty($library) and empty($composerFile) and empty($vendor)) {
-            $completefolder =  $this->staticfolder . DIRECTORY_SEPARATOR . ltrim(strtolower($folder), 'f');
+            $completefolder = $this->staticfolder . DIRECTORY_SEPARATOR . ltrim(string: strtolower(string: $folder), characters: 'f');
             $this->create_folder_if_not_exists(folder: $completefolder, permissions: $permissions);
         };
     }
 
-    function create_symlink(array $link): void
-    {
+    /**
+     * @param array $link 
+     * @return void 
+     * @author Christian Eichert <c@zp1.net>
+     * @version 1.0.0
+     */
+    public function create_symlink(
+        array $link
+    ): void {
 
         // if (is_link(filename: $link['link']) and readlink(path: $link['link']) ===  $link['target']) {
         //     return;
@@ -239,14 +223,18 @@ class symlink
      * @param string $folder 
      * @param int $permissions 
      * @return void 
+     * @author Christian Eichert <c@zp1.net>
+     * @version 1.0.0
      */
-    function create_folder_if_not_exists(string $folder = "", int $permissions = 0755): void
-    {
+    public function create_folder_if_not_exists(
+        string $folder = "",
+        int $permissions = 0755
+    ): void {
         $dirname = dirname($folder);
         foreach ($this->ordner_mit_kringel as $elem) {
-            $folder = strval($this->str_replace_last("/$elem", "/@$elem", $folder));
+            $folder = strval(value: $this->str_replace_last(search: "/replace: $elem", replace: "/@$elem", subject: $folder));
             // wenn oben kein dirname war, probieren wir noch einmal
-            $dirname ??= dirname($folder);
+            $dirname ??= dirname(path: $folder);
         }
         // does the folder exist? if yes skip
         if (!is_dir(filename: $folder) or empty(realpath(path: $folder))) {
@@ -258,7 +246,7 @@ class symlink
                     \Sentry\captureException($exception);
                 }
             } else {
-                error_log("can't write to $dirname <bR>");
+                error_log(message: "can't write to $dirname <bR>");
                 die("FILESYSTEM CRASHED");
             }
         }
@@ -270,14 +258,18 @@ class symlink
      * @param string $replace 
      * @param string|array $subject 
      * @return string|array 
+     * @author Christian Eichert <c@zp1.net>
+     * @version 1.0.0
      */
-    function str_replace_last(string $search, string $replace, array|string $subject): array|string
-    {
+    public function str_replace_last(
+        string $search,
+        string $replace,
+        array|string $subject
+    ) {
         $pos = strrpos(haystack: $subject, needle: $search);
-        if ($pos !== false) {
-            $subject = substr_replace(string: $subject, replace: $replace, offset: $pos, length: strlen($search));
-        }
-        return $subject;
+        return ($pos !== false) ?
+            substr_replace(string: $subject, replace: $replace, offset: $pos, length: strlen($search)) :
+            $subject;
     }
 
     /** 
@@ -288,8 +280,10 @@ class symlink
      * @param string $composerFile 
      * @param string $vendor 
      * @return bool 
+     * @author Christian Eichert <c@zp1.net>
+     * @version 1.0.0
      */
-    function checkLibraryInstallation(
+    public function checkLibraryInstallation(
         string $library,
         string $composerFile, // relative path to the composer/package-lock file
         string $vendor
@@ -299,10 +293,10 @@ class symlink
         $vendorArr = ["vendor", "node_modules"];
 
         if (!in_array($composerFile, $composerFileArr)) {
-            die("Can't check Libraries, composer($composerFile) not in composerFileArr(" . implode(" ", $composerFileArr) . ")");
+            die("Can't check Libraries, composer($composerFile) not in composerFileArr(" . implode(separator: " ", array: $composerFileArr) . ")");
         }
         if (!in_array($vendor, $vendorArr)) {
-            die("Can't check Libraries, vendor($vendor) not in vendorArr(" . implode(" ", $vendorArr) . ")");
+            die("Can't check Libraries, vendor($vendor) not in vendorArr(" . implode(separator: " ", array: $vendorArr) . ")");
         }
 
         $vendorDir = "$this->workspace/$vendor/$library";
@@ -310,17 +304,17 @@ class symlink
         $isLibraryInstalled = false;
 
         if (file_exists("$this->workspace/$composerFile") and $composerFile === "composer.json") {
-            $composerContent = json_decode(file_get_contents("$this->workspace/$composerFile"), true);
+            $composerContent = json_decode(json: file_get_contents(filename: "$this->workspace/$composerFile"), associative: true);
             $isLibraryRequired = isset($composerContent['require'][$library]);
         } elseif (file_exists("$this->workspace/$composerFile") and $composerFile === "package.json") {
-            $composerContent = json_decode(file_get_contents("$this->workspace/$composerFile"), true);
+            $composerContent = json_decode(json: file_get_contents(filename: "$this->workspace/$composerFile"), associative: true);
             $isLibraryRequired = isset($composerContent['dependencies'][$library]);
         } else {
             $isLibraryRequired = false;
         }
 
         // Check if the Bootstrap directory exists and is not empty
-        $isLibraryInstalled = is_dir($vendorDir) && (new \FilesystemIterator("/$vendorDir"))->valid();
+        $isLibraryInstalled = is_dir(filename: $vendorDir) && (new FilesystemIterator(directory: "/$vendorDir", flags: FilesystemIterator::SKIP_DOTS))->valid();
 
         // conclusion
         if ($isLibraryRequired && $isLibraryInstalled) {
