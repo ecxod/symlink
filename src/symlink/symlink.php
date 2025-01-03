@@ -325,4 +325,74 @@ class symlink
             return false;
         }
     }
+    
+    /**
+     * Check if the vendor exists and is readable
+     * @param string $vendor 
+     * @return bool 
+     * @author Christian Eichert <c@zp1.net>
+     * @version 1.0.0
+     */
+    public static function detect_vendor(string $vendor = null): bool
+    {
+        $vendor ??= \strval($_SERVER['VENDOR']);
+        $vendor ??= \strval(realpath($_SERVER['DOCUMENT_ROOT'] . '/vendor'));
+        if(is_readable(filename: realpath(path: $vendor))) {
+            $_SERVER['VENDOR_EXISTS'] = true;
+            return true;
+        }
+        else {
+            $_SERVER['VENDOR_EXISTS'] = false;
+            return false;
+        }
+    }
+
+   /**
+     * return all installed pakets of a framework, or false if none
+     * 
+     * @param string $subfolder default : ecxod
+     * @param string $vendor default : $_SERVER['VENDOR']
+     * @return array|bool|string
+     * @author Christian Eichert <c@zp1.net>
+     * @version 1.0.0
+     */
+    public function detect_framework_components($subfolder = "ecxod", string $vendor = null, string $output="array"): array|bool|string
+    {
+        $vendor ??= \strval($_SERVER['VENDOR']);
+        $vendor ??= \strval(realpath($_SERVER['DOCUMENT_ROOT'] . '/vendor'));
+
+        $vendorfolder_array = ["vendor", "node_modules"];
+        $outputarray = ["array","json","csv"];
+
+
+        foreach($vendorfolder_array as $folder) {
+            if(self::detect_vendor(vendor: $vendor) and str_contains(haystack: $vendor, needle: $folder)) {
+                $subfolderpath = realpath(path: $_SERVER['VENDOR'] . DIRECTORY_SEPARATOR . $subfolder);
+
+                if(is_readable(filename: $vendor) and is_readable(filename: $subfolderpath)) {
+                    // Alle Dateien und Ordner einlesen
+                    $result = scandir(directory: $subfolderpath, sorting_order: SCANDIR_SORT_ASCENDING) ?? [];
+                    // wenn nichts ausser . und .. dann leere array (kein fehler kein false kein scheiss)
+                    $directories = array_values(
+                        array_diff(
+                            is_array(value: $result) ? $result : [],
+                            ['..', '.']
+                        )
+                    );
+                    // Ausgangsformat erzeugen
+                    if(in_array(needle: $output,haystack: $outputarray) and gettype($directories) === 'array') {
+                        if($output ==="array"){
+                            return $directories;
+                        }elseif($output === "json"){
+                            return json_encode(value: $directories);
+                        }elseif($output === "csv"){
+                            return implode(separator: ",",array: $directories);
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 }
