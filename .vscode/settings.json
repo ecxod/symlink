@@ -1,9 +1,0 @@
-{
-    "php.format.rules.addCommaAfterLastArrayElement": true,
-    "php.format.rules.spaceWithinArrayInitilizersParens": true,
-    "php.format.rules.arrayInitializersNewLineBeforeFirstElement": true,
-    "php.format.rules.arrayInitializersAlignKeyValuePairs": true,
-    "php.format.rules.arrayInitializersNewLineAfterLastElement": true,
-    "php.format.rules.openBraceOnNewLineForAnonymousClasses": true,
-    "php.format.rules.openBraceOnNewLineForTypes": true
-}
