@@ -16,6 +16,8 @@ use function Ecxod\Funktionen\{m, logg, addIfNotExists};
  * install jquery
  * christian@black:/raid/home/christian/wdrive/buchungssatz $ npm install jquery
  * 
+ * // TODO : Versionsmanagement einführen
+ * 
  * @package symlink 
  * @author Christian Eichert <c@zp1.net>
  * @version 1.0.0
@@ -816,6 +818,8 @@ class symlink
         int $permissions = 0755
     ): void {
         $dirname = dirname($folder);
+
+        // wir setzen die kringel 
         foreach($this->ordner_mit_kringel as $elem)
         {
             $folder = strval(value: $this->str_replace_last(search: "/replace: $elem", replace: "/@$elem", subject: $folder));
@@ -840,7 +844,7 @@ class symlink
             else
             {
                 error_log(message: "can't write to $dirname <bR>");
-                die("FILESYSTEM CRASHED");
+                die("FILESYSTEM CRASHED " . __CLASS__ . '/' . __METHOD__ . ':' . __LINE__);
             }
         }
     }
@@ -858,10 +862,16 @@ class symlink
         string $search,
         string $replace,
         array|string $subject
-    ) {
-        $pos = strrpos(haystack: $subject, needle: $search);
-        return ($pos !== false) ?
-            substr_replace(string: $subject, replace: $replace, offset: $pos, length: strlen($search)) :
+    ): array|string {
+        $pos = \strrpos(haystack: $subject, needle: $search);
+        return
+            ($pos !== false) ?
+            \substr_replace(
+                string: $subject,
+                replace: $replace,
+                offset: $pos,
+                length: \strlen(string: $search)
+            ) :
             $subject;
     }
 
