@@ -37,6 +37,7 @@ class symlink
     protected array $tinymce;
     protected array $vendormodule;
     protected array $nodemodule;
+    protected array $projektarr;
 
     /**
      * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
@@ -411,7 +412,23 @@ class symlink
         return $this;
     }
 
+    /**
+     * @return array
+     */
+    public function getProjektarr(): array
+    {
+        return $this->projektarr;
+    }
 
+    /**
+     * @param array $projektarr 
+     * @return self
+     */
+    public function setProjektarr(array $projektarr): self
+    {
+        $this->projektarr = $projektarr;
+        return $this;
+    }
 
 
 
@@ -436,6 +453,33 @@ class symlink
      */
     public function __construct()
     {
+
+        if(empty($_SERVER['SYMLINK']))
+        {
+            die("ERROR: UNDOCUMENTED SYMLINK");
+        }
+        elseif(is_array(json_decode(json: $_SERVER['SYMLINK'], associative: true, flags: JSON_OBJECT_AS_ARRAY)))
+        {
+            $projektarr = [];
+            foreach(json_decode(json: $_SERVER['SYMLINK'], associative: true, flags: JSON_OBJECT_AS_ARRAY) as $key => $val)
+            {
+                if(!empty($val))
+                {
+                    $projektarr += [ $key ];
+                }
+            }
+            if(empty($projektarr))
+            {
+                error_log("ERROR: EMPTY SYMLINK (we will make no symlinks)");
+            }
+            $this->setProjektarr(projektarr: $projektarr);
+        }
+        else
+        {
+            die("ERROR: SOMEOTHERSHIT in SYMLINK");
+        }
+
+
         // TODO: was sind Ordner mit Kringel ?
         $this->setOrdnerMitKringel(ordner_mit_kringel: [ "popperjs" ]);
 
@@ -475,34 +519,53 @@ class symlink
 
 
 
-
-        if(\in_array(needle: "twbs/bootstrap", haystack: $this->getVendormodules()))
+        /**
+         "twbs/bootstrap"
+         */
+        if(
+            // physisch vorhanden
+            \in_array(needle: "twbs/bootstrap", haystack: $this->getVendormodules()) and
+            // gewuenscht in .env
+            \in_array(needle: "twbs/bootstrap", haystack: $this->getProjektarr())
+        )
         {
             $this->setDist($this->checkLibraryInstallation(library: "twbs/bootstrap", vendor: "vendor") ? [
                 'link'   => $this->makeLink(folder: 'bs', subfolder: 'dist'),
-                'target' => $this->makeTarget(vendor: 'vendor',library: 'twbs/bootstrap-icons',folder: 'dist'),
+                'target' => $this->makeTarget(vendor: 'vendor', library: 'twbs/bootstrap-icons', folder: 'dist'),
             ] : []);
             empty($this->getDist()) ? null : $this->create_symlink(link: $this->getDist());
         }
 
-        if(\in_array(needle: "twbs/bootstrap-icons", haystack: $this->getVendormodules()))
+        /**
+         "twbs/bootstrap-icons"
+         */
+        if(
+            \in_array(needle: "twbs/bootstrap-icons", haystack: $this->getVendormodules()) and
+            \in_array(needle: "twbs/bootstrap-icons", haystack: $this->getProjektarr())
+        )
         {
             $this->setFont(
                 font: $this->checkLibraryInstallation(library: "twbs/bootstrap-icons", vendor: "vendor") ? [
                     'link'   => $this->makeLink(folder: 'bs', subfolder: 'font'),
-                    'target' => $this->makeTarget(vendor: 'vendor',library: 'twbs/bootstrap-icons',folder: 'font'),
+                    'target' => $this->makeTarget(vendor: 'vendor', library: 'twbs/bootstrap-icons', folder: 'font'),
                 ] : []
             );
             empty($this->getFont()) ? null : $this->create_symlink(link: $this->getFont());
 
             $this->setIcons($this->checkLibraryInstallation(library: "twbs/bootstrap-icons", vendor: "vendor") ? [
                 'link'   => $this->makeLink(folder: 'bs', subfolder: 'icons'),
-                'target' => $this->makeTarget(vendor: 'vendor',library: 'twbs/bootstrap-icons',folder: 'icons'),
+                'target' => $this->makeTarget(vendor: 'vendor', library: 'twbs/bootstrap-icons', folder: 'icons'),
             ] : []);
             empty($this->getIcons()) ? null : $this->create_symlink(link: $this->getIcons());
         }
 
-        if(\in_array(needle: "jquery", haystack: $this->getNodemodules()))
+        /**
+         "jquery"
+         */
+        if(
+            \in_array(needle: "jquery", haystack: $this->getNodemodules()) and
+            \in_array(needle: "jquery", haystack: $this->getProjektarr())
+        )
         {
             $this->setJquery(
                 jquery: $this->checkLibraryInstallation(library: "jquery", vendor: "node_modules") ? [
@@ -513,7 +576,13 @@ class symlink
             empty($this->getJquery()) ? null : $this->create_symlink(link: $this->getJquery());
         }
 
-        if(\in_array(needle: "prismjs", haystack: $this->getNodemodules()))
+        /**
+         "prismjs"
+         */
+        if(
+            \in_array(needle: "prismjs", haystack: $this->getNodemodules()) and
+            \in_array(needle: "prismjs", haystack: $this->getProjektarr())
+        )
         {
             $this->setPrismjs(
                 prismjs: $this->checkLibraryInstallation(library: "prismjs", vendor: "node_modules") ? [
@@ -524,7 +593,13 @@ class symlink
             empty($this->prismjs) ? null : $this->create_symlink(link: $this->prismjs);
         }
 
-        if(\in_array(needle: "mathjax", haystack: $this->getNodemodules()))
+        /**
+         "mathjax"
+         */
+        if(
+            \in_array(needle: "mathjax", haystack: $this->getNodemodules()) and
+            \in_array(needle: "mathjax", haystack: $this->getProjektarr())
+        )
         {
             $this->setMathjax(
                 mathjax: $this->checkLibraryInstallation(library: "mathjax", vendor: "node_modules") ? [
@@ -535,7 +610,13 @@ class symlink
             empty($this->getMathjax()) ? null : $this->create_symlink(link: $this->getMathjax());
         }
 
-        if(\in_array(needle: "@popperjs", haystack: $this->getNodemodules()))
+        /**
+         "popperjs"
+         */
+        if(
+            \in_array(needle: "@popperjs", haystack: $this->getNodemodules()) and
+            \in_array(needle: "@popperjs", haystack: $this->getProjektarr())
+        )
         {
             $this->setPopperjs(
                 popperjs: $this->checkLibraryInstallation(library: "@popperjs", vendor: "node_modules") ? [
@@ -546,7 +627,13 @@ class symlink
             empty($this->getPopperjs()) ? null : $this->create_symlink(link: $this->getPopperjs());
         }
 
-        if(\in_array(needle: "tinymce", haystack: $this->getNodemodules()))
+        /**
+         "tinymce"
+         */
+        if(
+            \in_array(needle: "tinymce", haystack: $this->getNodemodules()) and
+            \in_array(needle: "tinymce", haystack: $this->getProjektarr())
+        )
         {
             $this->setTinymce(
                 tinymce: $this->checkLibraryInstallation(library: "tinymce", vendor: "node_modules") ? [
@@ -557,7 +644,13 @@ class symlink
             empty($this->getTinymce()) ? null : $this->create_symlink(link: $this->getTinymce());
         }
 
-        if(\in_array(needle: "chartjs", haystack: $this->getNodemodules()))
+        /**
+         "chartjs"
+         */
+        if(
+            \in_array(needle: "chartjs", haystack: $this->getNodemodules()) and
+            \in_array(needle: "chartjs", haystack: $this->getProjektarr())
+        )
         {
             $this->setChartjs(
                 chartjs: $this->checkLibraryInstallation(library: "chartjs", vendor: "node_modules") ? [
@@ -574,6 +667,13 @@ class symlink
 
     }
 
+    /** makes the string that contains the Link 
+     * @param string $folder 
+     * @param string|null $subfolder 
+     * @return string 
+     * @author Christian Eichert <c@zp1.net>
+     * @version 1.0.0
+     */
     protected function makeLink(string $folder, string $subfolder = null): string
     {
         if(empty($folder))
@@ -586,18 +686,31 @@ class symlink
         );
     }
 
+    /** makes string that contains the target for the link
+     * @param string $vendor 
+     * @param string $library 
+     * @param string|null $folder 
+     * @return string 
+     * @author Christian Eichert <c@zp1.net>
+     * @version 1.0.0
+     */
     protected function makeTarget(string $vendor, string $library, string $folder = null)
     {
-        if(empty($vendor) or empty($library)){
+        if(empty($vendor) or empty($library))
+        {
             die('ERROR: ' . __CLASS__ . "/" . __METHOD__ . ":" . __LINE__);
         }
 
-        if(str_contains( haystack: $library,needle:'/')){
-            $library_explode = explode('/',$library);
-            if(!empty($library_explode[0])){
+        if(str_contains(haystack: $library, needle: '/'))
+        {
+            $library_explode = explode('/', $library);
+            if(!empty($library_explode[0]))
+            {
                 $author = $library_explode[0];
                 $library = $library_explode[1];
-            }else{
+            }
+            else
+            {
                 $author = '';
                 $library = $library_explode[1];
             }
@@ -937,6 +1050,8 @@ class symlink
         }
         return false;
     }
+
+
 
 
 
