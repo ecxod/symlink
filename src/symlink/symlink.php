@@ -944,14 +944,14 @@ class symlink
     }
 
     /**
-     * Check if the vendor exists and is readable
-     * @param string $vendor 
+     * Check if the vendor exists and is readable 
      * @return bool 
      * @author Christian Eichert <c@zp1.net>
      * @version 1.0.0
      */
-    public static function detect_vendor(string $vendor = null): bool
+    public static function detect_vendor(): bool
     {
+        $vendor = null;
         $vendor ??= \strval($_SERVER['VENDOR']);
         $vendor ??= \strval(realpath($_SERVER['DOCUMENT_ROOT'] . '/vendor'));
 
@@ -1021,7 +1021,7 @@ class symlink
         {
 
             if(
-                self::detect_vendor(vendor: $vendor) and
+                self::detect_vendor() and
                 // wir pruefen ob der vendorname im vendorpfad ist
                 str_contains(haystack: $vendor, needle: $vendorname)
             )
