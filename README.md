@@ -24,4 +24,16 @@ CSS="static/css/"
 # JS_PATH=".../webroot/project/public/static/js/"
 # PIC="static/pic"
 # IMG="static/img"
+#
+# if not empty or not empty : 
+SYMLINK='{
+    "twbs/bootstrap":"y",
+    "twbs/bootstrap-icons":"",
+    "jquery":"y",
+    "prismjs":"",
+    "mathjax":"",
+    "popperjs":"",
+    "tinymce":"",
+    "chartjs":""
+}'
 ```
