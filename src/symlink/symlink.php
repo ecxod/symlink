@@ -480,7 +480,10 @@ class symlink
         }
 
 
-        // TODO: was sind Ordner mit Kringel ?
+
+        /**
+         * // TODO: In diese Array kommen alle Ordner mit Kringel
+         */
         $this->setOrdnerMitKringel(ordner_mit_kringel: [ "popperjs" ]);
 
         if(empty($_SERVER['DOCUMENT_ROOT']))
@@ -529,10 +532,12 @@ class symlink
             \in_array(needle: "twbs/bootstrap", haystack: $this->getProjektarr())
         )
         {
+            // wir bestimmen die Link source und destination als array of strings
             $this->setDist($this->checkLibraryInstallation(library: "twbs/bootstrap", vendor: "vendor") ? [
                 'link'   => $this->makeLink(folder: 'bs', subfolder: 'dist'),
                 'target' => $this->makeTarget(vendor: 'vendor', library: 'twbs/bootstrap-icons', folder: 'dist'),
             ] : []);
+            // wir erzeugen den Link
             empty($this->getDist()) ? null : $this->create_symlink(link: $this->getDist());
         }
 
@@ -1050,11 +1055,5 @@ class symlink
         }
         return false;
     }
-
-
-
-
-
-
 
 }
