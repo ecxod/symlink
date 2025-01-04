@@ -518,8 +518,8 @@ class symlink
         $this->check_and_create_folder_if_not_exists(folder: 'js');
         $this->check_and_create_folder_if_not_exists(folder: 'img');
 
-        $this->setVendormodules(vendormodule: $this->detect_framework_components(vendor: "vendor"));
-        $this->setNodemodules(nodemodule: $this->detect_framework_components(vendor: "node_modules"));
+        $this->setVendormodules(vendormodule: $this->detect_framework_components(vendor_name: "vendor"));
+        $this->setNodemodules(nodemodule: $this->detect_framework_components(vendor_name: "node_modules"));
 
 
 
@@ -535,7 +535,7 @@ class symlink
         )
         {
             // wir bestimmen die Link source und destination als array of strings
-            $this->setDist($this->checkLibraryInstallation(library: "twbs/bootstrap", vendor: "vendor") ? [
+            $this->setDist($this->checkLibraryInstallation(library: "twbs/bootstrap", vendor: "vendor") ? [ 
                 'link'   => $this->makeLink(folder: 'bs', subfolder: 'dist'),
                 'target' => $this->makeTarget(vendor: 'vendor', library: 'twbs/bootstrap-icons', folder: 'dist'),
             ] : []);
@@ -552,14 +552,14 @@ class symlink
         )
         {
             $this->setFont(
-                font: $this->checkLibraryInstallation(library: "twbs/bootstrap-icons", vendor: "vendor") ? [
+                font: $this->checkLibraryInstallation(library: "twbs/bootstrap-icons", vendor: "vendor") ? [ 
                     'link'   => $this->makeLink(folder: 'bs', subfolder: 'font'),
                     'target' => $this->makeTarget(vendor: 'vendor', library: 'twbs/bootstrap-icons', folder: 'font'),
                 ] : []
             );
             empty($this->getFont()) ? null : $this->create_symlink(link: $this->getFont());
 
-            $this->setIcons($this->checkLibraryInstallation(library: "twbs/bootstrap-icons", vendor: "vendor") ? [
+            $this->setIcons($this->checkLibraryInstallation(library: "twbs/bootstrap-icons", vendor: "vendor") ? [ 
                 'link'   => $this->makeLink(folder: 'bs', subfolder: 'icons'),
                 'target' => $this->makeTarget(vendor: 'vendor', library: 'twbs/bootstrap-icons', folder: 'icons'),
             ] : []);
@@ -575,7 +575,7 @@ class symlink
         )
         {
             $this->setJquery(
-                jquery: $this->checkLibraryInstallation(library: "jquery", vendor: "node_modules") ? [
+                jquery: $this->checkLibraryInstallation(library: "jquery", vendor: "node_modules") ? [ 
                     'link'   => $this->makeLink(folder: 'jquery'),
                     'target' => $this->makeTarget(vendor: 'node_modules', library: 'jquery', folder: 'dist'),
                 ] : []
@@ -592,7 +592,7 @@ class symlink
         )
         {
             $this->setPrismjs(
-                prismjs: $this->checkLibraryInstallation(library: "prismjs", vendor: "node_modules") ? [
+                prismjs: $this->checkLibraryInstallation(library: "prismjs", vendor: "node_modules") ? [ 
                     'link'   => $this->makeLink(folder: 'prismjs'),
                     'target' => $this->makeTarget(vendor: 'node_modules', library: 'prismjs'),
                 ] : []
@@ -609,7 +609,7 @@ class symlink
         )
         {
             $this->setMathjax(
-                mathjax: $this->checkLibraryInstallation(library: "mathjax", vendor: "node_modules") ? [
+                mathjax: $this->checkLibraryInstallation(library: "mathjax", vendor: "node_modules") ? [ 
                     'link'   => $this->makeLink(folder: 'mathjax'),
                     'target' => $this->makeTarget(vendor: 'node_modules', library: 'mathjax'),
                 ] : []
@@ -626,7 +626,7 @@ class symlink
         )
         {
             $this->setPopperjs(
-                popperjs: $this->checkLibraryInstallation(library: "@popperjs", vendor: "node_modules") ? [
+                popperjs: $this->checkLibraryInstallation(library: "@popperjs", vendor: "node_modules") ? [ 
                     'link'   => $this->makeLink(folder: '@popperjs', subfolder: 'core'),
                     'target' => $this->makeTarget(vendor: 'node_modules', library: '@popperjs', folder: 'core'),
                 ] : []
@@ -643,7 +643,7 @@ class symlink
         )
         {
             $this->setTinymce(
-                tinymce: $this->checkLibraryInstallation(library: "tinymce", vendor: "node_modules") ? [
+                tinymce: $this->checkLibraryInstallation(library: "tinymce", vendor: "node_modules") ? [ 
                     'link'   => $this->makeLink(folder: 'tinymce'),
                     'target' => $this->makeTarget(vendor: 'node_modules', library: 'tinymce'),
                 ] : []
@@ -660,7 +660,7 @@ class symlink
         )
         {
             $this->setChartjs(
-                chartjs: $this->checkLibraryInstallation(library: "chartjs", vendor: "node_modules") ? [
+                chartjs: $this->checkLibraryInstallation(library: "chartjs", vendor: "node_modules") ? [ 
                     'link'   => $this->makeLink(folder: 'chartjs'),
                     'target' => $this->makeTarget(vendor: 'node_modules', library: 'chartjs'),
                 ] : []
@@ -915,12 +915,12 @@ class symlink
         if(file_exists("$this->workspace/$composerFile") and $composerFile === "composer.json")
         {
             $composerContent = json_decode(json: file_get_contents(filename: "$this->workspace/$composerFile"), associative: true);
-            $isLibraryRequired = isset($composerContent['require'][$library]);
+            $isLibraryRequired = isset($composerContent['require'][ $library ]);
         }
         elseif(file_exists("$this->workspace/$composerFile") and $composerFile === "package.json")
         {
             $composerContent = json_decode(json: file_get_contents(filename: "$this->workspace/$composerFile"), associative: true);
-            $isLibraryRequired = isset($composerContent['dependencies'][$library]);
+            $isLibraryRequired = isset($composerContent['dependencies'][ $library ]);
         }
         else
         {
@@ -974,17 +974,14 @@ class symlink
      * zB alle komponenten in ecxod: detect_framework_components(subfolder:"ecxod", vendor:"vendor") => symlink, funktionen etc ...
      * zB alle node module:          detect_framework_components(vendor:"node_modules") => jquery etc ...
      * 
-     * @param string $subfolder default : ecxod
-     * @param string $vendor default : $_SERVER['VENDOR']
+     * @param string $library default : ecxod
+     * @param string $vendor_name default : $_SERVER['VENDOR']
      * @return array|bool|string
      * @author Christian Eichert <c@zp1.net>
      * @version 1.0.0
      */
-    public function detect_framework_components($library = "", string $vendor = null, string $output = "array")
+    public function detect_framework_components($library = "", string $vendor_name = null, string $output = "array"): array|bool|string
     {
-        $vendor ??= \strval($_SERVER['VENDOR']);
-        $vendor ??= \strval(realpath($_SERVER['DOCUMENT_ROOT'] . '/vendor'));
-
         // enthaelt die relativen pfade der vendoren
         $vendorfolder_array = [ "vendor", "node_modules" ];
         // das resultat wird als arr, json oder cvs ausgegeben
@@ -994,7 +991,7 @@ class symlink
         $project = "";
 
         // library in node_modules is like project
-        if($vendor === 'node_modules')
+        if($vendor_name === 'node_modules')
         {
             if(!empty($library))
             {
@@ -1002,7 +999,7 @@ class symlink
             }
         }
         // library in vendor is like author/project
-        if($vendor === 'vendor')
+        if($vendor_name === 'vendor')
         {
             if(!empty($library))
             {
@@ -1023,15 +1020,15 @@ class symlink
             if(
                 self::detect_vendor() and
                 // wir pruefen ob der vendorname im vendorpfad ist
-                str_contains(haystack: $vendor, needle: $vendorname)
+                str_contains(haystack: strval(value: $_ENV['VENDOR']), needle: $vendorname)
             )
             {
                 $subfolderpath =
                     (empty($library)) ?
-                    realpath(path: $_SERVER['VENDOR']) :
-                    realpath(path: $_SERVER['VENDOR'] . DIRECTORY_SEPARATOR . $project);
+                    realpath(path: $_ENV['VENDOR']) :
+                    realpath(path: $_ENV['VENDOR'] . DIRECTORY_SEPARATOR . $project);
 
-                if(is_readable(filename: $vendor) and is_readable(filename: $subfolderpath))
+                if(is_readable(filename: strval(value: $_ENV['VENDOR'])) and is_readable(filename: $subfolderpath))
                 {
                     // Alle Dateien und Ordner in eine Array einlesen
                     $result = scandir(directory: $subfolderpath, sorting_order: SCANDIR_SORT_ASCENDING) ?? [];
