@@ -30,7 +30,8 @@
             ".github",
             ".vscode",
             "tests",
-            "vendor"
+            "vendor",
+            "wiki"
         ]
     }
 }
