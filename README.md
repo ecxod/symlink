@@ -25,15 +25,24 @@ CSS="static/css/"
 # PIC="static/pic"
 # IMG="static/img"
 #
-# if not empty or not empty : 
-SYMLINK='{
-    "twbs/bootstrap":"y",
-    "twbs/bootstrap-icons":"",
-    "jquery":"y",
-    "prismjs":"",
-    "mathjax":"",
-    "popperjs":"",
-    "tinymce":"",
-    "chartjs":""
-}'
 ```
+cat symlink.json
+
+```json
+{
+    "node_modules": {
+        "chartjs": false,
+        "jquery": true,
+        "mathjax": false,
+        "popperjs": true,
+        "prismjs": false,
+        "stackblitz": true,
+        "tinymce": false
+    },
+    "vendor": {
+        "twbs/bootstrap": true,
+        "twbs/bootstrap-icons": true
+    }
+}
+```
+
