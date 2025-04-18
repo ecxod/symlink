@@ -8,6 +8,7 @@ npm i jquery
 npm i mathjax
 npm i prismjs
 npm i popperjs
+npm i semantic-ui
 ```
 
 cat .env
