@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ecxod\Symlink;
 
-use \FilesystemIterator;
 use function Ecxod\Funktionen\{m, logg, addIfNotExists};
 
 /** 
@@ -794,7 +793,7 @@ class symlink
         {
             try
             {
-                symlink(target: $link['target'], link: $link['link']);
+                \symlink(target: $link['target'], link: $link['link']);
             }
             catch (\Throwable $e)
             {
@@ -817,20 +816,20 @@ class symlink
         string $folder = "",
         int $permissions = 0755
     ): void {
-        $dirname = dirname($folder);
+        $dirname = \dirname($folder);
 
         // wir setzen die kringel 
         foreach($this->ordner_mit_kringel as $elem)
         {
-            $folder = strval(value: $this->str_replace_last(search: "/replace: $elem", replace: "/@$elem", subject: $folder));
+            $folder = \strval(value: $this->str_replace_last(search: "/replace: $elem", replace: "/@$elem", subject: $folder));
             // wenn oben kein dirname war, probieren wir noch einmal
             $dirname ??= dirname(path: $folder);
         }
         // does the folder exist? if yes skip
-        if(!is_dir(filename: $folder) or empty(realpath(path: $folder)))
+        if(!\is_dir(filename: $folder) or empty(\realpath(path: $folder)))
         {
             // ist the parent writable ?
-            if(!empty($dirname) and is_dir(filename: $dirname) and is_writable(filename: $dirname))
+            if(!empty($dirname) and \is_dir(filename: $dirname) and \is_writable(filename: $dirname))
             {
                 try
                 {
@@ -843,7 +842,7 @@ class symlink
             }
             else
             {
-                error_log(message: "can't write to $dirname <bR>");
+                \error_log(message: "can't write to $dirname <bR>");
                 die("FILESYSTEM CRASHED " . __CLASS__ . '/' . __METHOD__ . ':' . __LINE__);
             }
         }
@@ -895,7 +894,7 @@ class symlink
 
         if(!in_array($vendor, $vendorArr))
         {
-            die("Can't check Libraries, vendor($vendor) not in vendorArr(" . implode(separator: " ", array: $vendorArr) . ")");
+            die("Can't check Libraries, vendor($vendor) not in vendorArr(" . \implode(separator: " ", array: $vendorArr) . ")");
         }
 
         if($vendor == "vendor")
@@ -928,7 +927,8 @@ class symlink
         }
 
         // Check if the Bootstrap directory exists and is not empty
-        $isLibraryInstalled = is_dir(filename: $vendorDir) && (new FilesystemIterator(directory: "/$vendorDir", flags: FilesystemIterator::SKIP_DOTS))->valid();
+        //$isLibraryInstalled = \is_dir(filename: $vendorDir) && (new FilesystemIterator(directory: "/$vendorDir", flags: FilesystemIterator::SKIP_DOTS))->valid();
+        $isLibraryInstalled = \is_dir($vendorDir) && !empty(scandir($vendorDir));
 
         // conclusion
         if($isLibraryRequired && $isLibraryInstalled)
@@ -953,9 +953,9 @@ class symlink
     {
         $vendor = null;
         $vendor ??= \strval($_SERVER['VENDOR']);
-        $vendor ??= \strval(realpath($_SERVER['DOCUMENT_ROOT'] . '/vendor'));
+        $vendor ??= \strval(\realpath($_SERVER['DOCUMENT_ROOT'] . '/vendor'));
 
-        if(is_readable(filename: realpath(path: $vendor)))
+        if(\is_readable(filename: \realpath(path: $vendor)))
         {
             $_SERVER['VENDOR_EXISTS'] = true;
             return true;
@@ -1003,7 +1003,7 @@ class symlink
         {
             if(!empty($library))
             {
-                $explode_library = explode(separator: '/', string: $library, limit: 2);
+                $explode_library = \explode(separator: '/', string: $library, limit: 2);
                 if(!empty($explode_library))
                 {
                     if(!empty($explode_library[0]))
@@ -1020,29 +1020,29 @@ class symlink
             if(
                 self::detect_vendor() and
                 // wir pruefen ob der vendorname im vendorpfad ist
-                str_contains(haystack: strval(value: $_ENV['VENDOR']), needle: $vendorname)
+                \str_contains(haystack: \strval(value: $_ENV['VENDOR']), needle: $vendorname)
             )
             {
                 $subfolderpath =
                     (empty($library)) ?
-                    realpath(path: $_ENV['VENDOR']) :
-                    realpath(path: $_ENV['VENDOR'] . DIRECTORY_SEPARATOR . $project);
+                    \realpath(path: $_ENV['VENDOR']) :
+                    \realpath(path: $_ENV['VENDOR'] . DIRECTORY_SEPARATOR . $project);
 
-                if(is_readable(filename: strval(value: $_ENV['VENDOR'])) and is_readable(filename: $subfolderpath))
+                if(\is_readable(filename: \strval(value: $_ENV['VENDOR'])) and \is_readable(filename: $subfolderpath))
                 {
                     // Alle Dateien und Ordner in eine Array einlesen
-                    $result = scandir(directory: $subfolderpath, sorting_order: SCANDIR_SORT_ASCENDING) ?? [];
+                    $result = \scandir(directory: $subfolderpath, sorting_order: SCANDIR_SORT_ASCENDING) ?? [];
 
                     // wenn nichts ausser . und .. dann leere array (kein fehler kein false kein scheiss)
-                    $directories = array_values(
-                        array_diff(
-                            is_array(value: $result) ? $result : [],
+                    $directories = \array_values(
+                        \array_diff(
+                            \is_array(value: $result) ? $result : [],
                             [ '..', '.' ]
                         )
                     );
 
                     // Ausgangsformat erzeugen
-                    if(in_array(needle: $output, haystack: $outputarray) and gettype($directories) === 'array')
+                    if(\in_array(needle: $output, haystack: $outputarray) and \gettype($directories) === 'array')
                     {
                         if($output === "array")
                         {
@@ -1050,11 +1050,11 @@ class symlink
                         }
                         elseif($output === "json")
                         {
-                            return json_encode(value: $directories);
+                            return \json_encode(value: $directories);
                         }
                         elseif($output === "csv")
                         {
-                            return implode(separator: ",", array: $directories);
+                            return \implode(separator: ",", array: $directories);
                         }
                     }
                 }
