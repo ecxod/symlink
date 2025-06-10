@@ -99,7 +99,7 @@ When you first run the library, it creates and continuously updates a file calle
 }
 ```
 
-If you are familiar with the JSON file structure, all you need to know is that the desired link is nested in the JSON as an array like: `["source" => "destination"]`, where the source is the library folder and the destination is the public folder. If you remove the array, empty it, or replace it with `false`, the link will be removed the next time the library runs.
+If you are familiar with the JSON file structure, all you need to know is that the desired link is nested in the JSON as an JSON like: `{ "source" : "destination" }`, where the source is the library folder and the destination is the public folder. If you remove the array, empty it, or replace it with `false`, the link will be removed the next time the library runs.
 
 ### cat symlink.json
 ```json
