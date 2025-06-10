@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Ecxod\Symlink;
 
-use Throwable;
-use function Ecxod\Funktionen\{m, logg, addIfNotExists};
 use \FilesystemIterator;
-use function is_dir;
+use \JsonException;
+use \RuntimeException;
+use \Throwable;
+use function Ecxod\Funktionen\{m, logg, addIfNotExists};
 
 /** 
  * IMPORTANT : 
@@ -30,19 +31,19 @@ class symlink
      * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
      * @var array
      */
-    protected array $chartjs;
-    protected array $dist;
-    protected array $font;
-    protected array $icons;
-    protected array $jquery;
-    protected array $prismjs;
-    protected array $popperjs;
-    protected array $mathjax;
-    protected array $tinymce;
-    protected array $vendormodule;
-    protected array $nodemodule;
-    protected array $projektarr;
-    protected array $symlink_array;
+    protected array  $chartjs;
+    protected array  $dist;
+    protected array  $font;
+    protected array  $icons;
+    protected array  $jquery;
+    protected array  $prismjs;
+    protected array  $popperjs;
+    protected array  $mathjax;
+    protected array  $tinymce;
+    protected array  $vendormodule;
+    protected array  $nodemodule;
+    protected array  $projektarr;
+    protected array  $symlink_array;
     protected string $symlink_file;
     protected string $symlink_json;
 
@@ -420,6 +421,7 @@ class symlink
 
 
 
+
     /** 
      * @return void
      * @author Christian Eichert <c@zp1.net>
@@ -427,6 +429,9 @@ class symlink
      */
     public function __construct()
     {
+
+        $this->create_symlink_example();
+
         $_SERVER['WORKSPACE'] ??= strval(realpath($_SERVER['DOCUMENT_ROOT'] . "/../"));
 
         $_ENV['VENDOR'] ??= $_SERVER['WORKSPACE'] . DIRECTORY_SEPARATOR . 'vendor';
@@ -644,12 +649,117 @@ class symlink
             empty($this->getChartjs()) ? null : $this->create_symlink(link: $this->getChartjs());
         }
 
-
-
-
-
     }
 
+
+    /**
+     * Erstellt oder aktualisiert symlink-example.json mit Abhängigkeiten aus composer.json und package.json.
+     * Setzt alle Werte auf false und überspringt die Erstellung, wenn die Datei aktuell ist.
+     *
+     * @throws RuntimeException Bei Problemen mit Dateizugriff
+     * @throws JsonException Bei ungültigem JSON
+     * @return void
+     */
+    protected function create_symlink_example()
+    {
+        try {
+            // Ermittle Workspace-Pfad
+            $workspace = realpath($_SERVER['DOCUMENT_ROOT'] . "/..");
+            if ($workspace === false) {
+                throw new RuntimeException("Ungültiger Workspace-Pfad");
+            }
+            $_ENV['WORKSPACE'] ??= $workspace;
+    
+            // Pfade zu den JSON-Dateien
+            $composer_json = $_ENV['WORKSPACE'] . DIRECTORY_SEPARATOR . 'composer.json';
+            $package_json = $_ENV['WORKSPACE'] . DIRECTORY_SEPARATOR . 'package.json';
+            $symlink_example_existent = $_ENV['WORKSPACE'] . DIRECTORY_SEPARATOR . 'symlink-example.json';
+    
+            // Prüfe und lese composer.json
+            if (!file_exists($composer_json) || !is_readable($composer_json)) {
+                throw new RuntimeException("composer.json nicht gefunden oder nicht lesbar");
+            }
+            $composer_content = file_get_contents($composer_json);
+            if ($composer_content === false) {
+                throw new RuntimeException("Konnte composer.json nicht lesen");
+            }
+            $composer_obj = json_decode($composer_content, true, 512, JSON_INVALID_UTF8_SUBSTITUTE);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new JsonException("Ungültiges JSON in composer.json: " . json_last_error_msg());
+            }
+    
+            // Prüfe und lese package.json
+            if (!file_exists($package_json) || !is_readable($package_json)) {
+                throw new RuntimeException("package.json nicht gefunden oder nicht lesbar");
+            }
+            $package_content = file_get_contents($package_json);
+            if ($package_content === false) {
+                throw new RuntimeException("Konnte package.json nicht lesen");
+            }
+            $package_obj = json_decode($package_content, true, 512, JSON_INVALID_UTF8_SUBSTITUTE);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new JsonException("Ungültiges JSON in package.json: " . json_last_error_msg());
+            }
+    
+            // Prüfe erforderliche Schlüssel
+            if (!isset($composer_obj['require'], $package_obj['dependencies'])) {
+                throw new RuntimeException("Erforderliche Schlüssel 'require' oder 'dependencies' fehlen");
+            }
+    
+            // Setze alle Werte in require und dependencies auf false
+            $require_modified = array_map(fn($value) => false, $composer_obj['require']);
+            $dependencies_modified = array_map(fn($value) => false, $package_obj['dependencies']);
+    
+            // Erstelle kombiniertes JSON-Datenarray
+            $symlink_data = [
+                'require' => $require_modified,
+                'dependencies' => $dependencies_modified,
+            ];
+    
+            // Prüfe, ob symlink-example.json existiert und aktuell ist
+            $symlink_example_existent_object = null;
+            if (file_exists($symlink_example_existent) && is_readable($symlink_example_existent)) {
+                $symlink_example_existent_content = file_get_contents($symlink_example_existent);
+                if ($symlink_example_existent_content === false) {
+                    throw new RuntimeException("Konnte symlink-example.json nicht lesen");
+                }
+                $symlink_example_existent_object = json_decode($symlink_example_existent_content, true, 512, JSON_INVALID_UTF8_SUBSTITUTE);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new JsonException("Ungültiges JSON in symlink-example.json: " . json_last_error_msg());
+                }
+                // Vergleiche die Daten direkt, um doppelte Kodierung zu vermeiden
+                if ($symlink_data === $symlink_example_existent_object) {
+                    return; // Datei ist aktuell
+                }
+            }
+    
+            // Prüfe Schreibrechte
+            $symlink_dir = dirname($symlink_example_existent);
+            if (!is_writable($symlink_dir)) {
+                throw new RuntimeException("Verzeichnis für symlink-example.json ist nicht beschreibbar");
+            }
+            
+
+
+            // Kodiere die Daten nur einmal und schreibe die Ausgabedatei
+            $symlink_json = json_encode($symlink_data, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
+            $symlink_json = str_replace('\/','/',$symlink_json);
+
+            if (file_put_contents($symlink_example_existent, $symlink_json) === false) {
+                throw new RuntimeException("Konnte symlink-example.json nicht schreiben");
+            }
+        } catch (Exception $e) {
+            error_log("Fehler: " . $e->getMessage());
+            exit("Ein Fehler ist aufgetreten: " . $e->getMessage());
+        }
+    }
+
+
+
+
+
+
+    
     /** makes the string that contains the Link 
      * @param string $folder 
      * @param string|null $subfolder 
