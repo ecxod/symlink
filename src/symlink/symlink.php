@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Ecxod\Symlink;
 
+use Throwable;
 use function Ecxod\Funktionen\{m, logg, addIfNotExists};
+use \FilesystemIterator;
+use function is_dir;
 
 /** 
  * IMPORTANT : 
@@ -39,6 +42,9 @@ class symlink
     protected array $vendormodule;
     protected array $nodemodule;
     protected array $projektarr;
+    protected array $symlink_array;
+    protected string $symlink_file;
+    protected string $symlink_json;
 
     /**
      * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
@@ -69,12 +75,11 @@ class symlink
     /**
      * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
      * @param string $workspace Das sind string-werte der ordner in den die symlinks erstellt werden sollen
-     * @return self
+     * @return void
      */
-    public function setWorkspace(string $workspace): self
+    public function setWorkspace(string $workspace): void
     {
         $this->workspace = $workspace;
-        return $this;
     }
 
     /**
@@ -89,12 +94,11 @@ class symlink
     /**
      * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
      * @param string $documentroot Das sind string-werte der ordner in den die symlinks erstellt werden sollen
-     * @return self
+     * @return void
      */
-    public function setDocumentroot(string $documentroot): self
+    public function setDocumentroot(string $documentroot): void
     {
         $this->documentroot = $documentroot;
-        return $this;
     }
 
     /**
@@ -109,12 +113,11 @@ class symlink
     /**
      * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
      * @param string $doxygenfolder Das sind string-werte der ordner in den die symlinks erstellt werden sollen
-     * @return self
+     * @return void
      */
-    public function setDoxygenfolder(string $doxygenfolder): self
+    public function setDoxygenfolder(string $doxygenfolder): void
     {
         $this->doxygenfolder = $doxygenfolder;
-        return $this;
     }
 
     /**
@@ -129,12 +132,11 @@ class symlink
     /**
      * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
      * @param string $staticfolder Das sind string-werte der ordner in den die symlinks erstellt werden sollen
-     * @return self
+     * @return void
      */
-    public function setStaticfolder(string $staticfolder): self
+    public function setStaticfolder(string $staticfolder): void
     {
         $this->staticfolder = $staticfolder;
-        return $this;
     }
 
     /**
@@ -149,12 +151,11 @@ class symlink
     /**
      * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
      * @param string $staticfolder_bs Das sind string-werte der ordner in den die symlinks erstellt werden sollen
-     * @return self
+     * @return void
      */
-    public function setStaticfolderBs(string $staticfolder_bs): self
+    public function setStaticfolderBs(string $staticfolder_bs): void
     {
         $this->staticfolder_bs = $staticfolder_bs;
-        return $this;
     }
 
     /**
@@ -169,12 +170,11 @@ class symlink
     /**
      * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
      * @param string $popperfolder Das sind string-werte der ordner in den die symlinks erstellt werden sollen
-     * @return self
+     * @return void
      */
-    public function setPopperfolder(string $popperfolder): self
+    public function setPopperfolder(string $popperfolder): void
     {
         $this->popperfolder = $popperfolder;
-        return $this;
     }
 
     /**
@@ -189,12 +189,11 @@ class symlink
     /**
      * Das sind ordner die mit einem @ beginnen sollen wegen kompatibilität mit npm
      * @param array $ordner_mit_kringel Das sind ordner die mit einem @ beginnen sollen wegen kompatibilität mit npm
-     * @return self
+     * @return
      */
-    public function setOrdnerMitKringel(array $ordner_mit_kringel): self
+    public function setOrdnerMitKringel(array $ordner_mit_kringel): void
     {
         $this->ordner_mit_kringel = $ordner_mit_kringel;
-        return $this;
     }
 
     /**
@@ -209,12 +208,11 @@ class symlink
     /**
      * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
      * @param array $chartjs Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
-     * @return self
+     * @return void
      */
-    public function setChartjs(array $chartjs): self
+    public function setChartjs(array $chartjs): void
     {
         $this->chartjs = $chartjs;
-        return $this;
     }
 
     /**
@@ -229,12 +227,11 @@ class symlink
     /**
      * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
      * @param array $dist Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
-     * @return self
+     * @return void
      */
-    public function setDist(array $dist): self
+    public function setDist(array $dist): void
     {
         $this->dist = $dist;
-        return $this;
     }
 
     /**
@@ -249,12 +246,11 @@ class symlink
     /**
      * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
      * @param array $font Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
-     * @return self
+     * @return void
      */
-    public function setFont(array $font): self
+    public function setFont(array $font): void
     {
         $this->font = $font;
-        return $this;
     }
 
     /**
@@ -269,12 +265,11 @@ class symlink
     /**
      * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
      * @param array $icons Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
-     * @return self
+     * @return void
      */
-    public function setIcons(array $icons): self
+    public function setIcons(array $icons): void
     {
         $this->icons = $icons;
-        return $this;
     }
 
     /**
@@ -289,12 +284,11 @@ class symlink
     /**
      * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
      * @param array $jquery Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
-     * @return self
+     * @return void
      */
-    public function setJquery(array $jquery): self
+    public function setJquery(array $jquery): void
     {
         $this->jquery = $jquery;
-        return $this;
     }
 
     /**
@@ -309,12 +303,11 @@ class symlink
     /**
      * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
      * @param array $prismjs Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
-     * @return self
+     * @return void
      */
-    public function setPrismjs(array $prismjs): self
+    public function setPrismjs(array $prismjs): void
     {
         $this->prismjs = $prismjs;
-        return $this;
     }
 
     /**
@@ -329,12 +322,11 @@ class symlink
     /**
      * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
      * @param array $popperjs Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
-     * @return self
+     * @return void
      */
-    public function setPopperjs(array $popperjs): self
+    public function setPopperjs(array $popperjs): void
     {
         $this->popperjs = $popperjs;
-        return $this;
     }
 
     /**
@@ -349,12 +341,11 @@ class symlink
     /**
      * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
      * @param array $mathjax Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
-     * @return self
+     * @return void
      */
-    public function setMathjax(array $mathjax): self
+    public function setMathjax(array $mathjax): void
     {
         $this->mathjax = $mathjax;
-        return $this;
     }
 
     /**
@@ -369,12 +360,11 @@ class symlink
     /**
      * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
      * @param array $tinymce Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
-     * @return self
+     * @return void
      */
-    public function setTinymce(array $tinymce): self
+    public function setTinymce(array $tinymce): void
     {
         $this->tinymce = $tinymce;
-        return $this;
     }
 
     /**
@@ -387,12 +377,11 @@ class symlink
 
     /**
      * @param array $vendormodule 
-     * @return self
+     * @return void
      */
-    public function setVendormodules(array $vendormodule): self
+    public function setVendormodules(array $vendormodule): void
     {
         $this->vendormodule = $vendormodule;
-        return $this;
     }
 
     /**
@@ -405,12 +394,11 @@ class symlink
 
     /**
      * @param array $nodemodule 
-     * @return self
+     * @return void
      */
-    public function setNodemodules(array $nodemodule): self
+    public function setNodemodules(array $nodemodule): void
     {
         $this->nodemodule = $nodemodule;
-        return $this;
     }
 
     /**
@@ -423,27 +411,12 @@ class symlink
 
     /**
      * @param array $projektarr 
-     * @return self
+     * @return void
      */
-    public function setProjektarr(array $projektarr): self
+    public function setProjektarr(array $projektarr): void
     {
         $this->projektarr = $projektarr;
-        return $this;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -454,32 +427,41 @@ class symlink
      */
     public function __construct()
     {
+        $_SERVER['WORKSPACE'] ??= strval(realpath($_SERVER['DOCUMENT_ROOT'] . "/../"));
 
-        if(empty($_SERVER['SYMLINK']))
+        $_ENV['VENDOR'] ??= $_SERVER['WORKSPACE'] . DIRECTORY_SEPARATOR . 'vendor';
+        $this->symlink_file = $_SERVER['WORKSPACE'] . DIRECTORY_SEPARATOR . 'symlink.json';
+        // echo $this->symlink_file;
+
+        if(!empty($this->symlink_file) and is_readable($this->symlink_file))
         {
-            die("ERROR: UNDOCUMENTED SYMLINK");
-        }
-        elseif(is_array(json_decode(json: $_SERVER['SYMLINK'], associative: true, flags: JSON_OBJECT_AS_ARRAY)))
-        {
-            $projektarr = [];
-            foreach(json_decode(json: $_SERVER['SYMLINK'], associative: true, flags: JSON_OBJECT_AS_ARRAY) as $key => $val)
-            {
-                if(!empty($val))
-                {
-                    $projektarr += [ $key ];
-                }
-            }
-            if(empty($projektarr))
-            {
-                error_log("ERROR: EMPTY SYMLINK (we will make no symlinks)");
-            }
-            $this->setProjektarr(projektarr: $projektarr);
+            $this->symlink_json  = file_get_contents($this->symlink_file);
+            $this->symlink_array = json_decode(json: $this->symlink_json, associative: true, flags: JSON_OBJECT_AS_ARRAY);
+
+            // #print_r($this->symlink_file);
+            // #print_r($this->symlink_array);
+
+            // if(is_array($this->symlink_array))
+            // {
+            //     $projektarr = [];
+            //     foreach($this->symlink_array as $key => $val)
+            //     {
+            //         if(!empty($val))
+            //         {
+            //             $projektarr += [ $key ];
+            //         }
+            //     }
+            //     if(empty($projektarr))
+            //     {
+            //         error_log("ERROR: EMPTY SYMLINK (we will make no symlinks)");
+            //     }
+            //     $this->setProjektarr(projektarr: $projektarr);
+            // }
         }
         else
         {
-            die("ERROR: SOMEOTHERSHIT in SYMLINK");
+            die("ERROR: UNDOCUMENTED SYMLINK - create a \"symlink.json\" file in the project base folder, netx to the vendor folder.");
         }
-
 
 
         /**
@@ -492,17 +474,12 @@ class symlink
             die("ERROR: UNDOCUMENTED DOCUMENT_ROOT");
         }
 
-        if(empty($_SERVER['WORKSPACE']))
-        {
-            die("ERROR: UNDOCUMENTED WORKSPACE");
-        }
+        $this->setDocumentroot($_SERVER['DOCUMENT_ROOT']);
+        $this->setWorkspace($_SERVER['WORKSPACE']);
 
-        $this->setDocumentroot(documentroot: realpath(path: strval(value: $_SERVER['DOCUMENT_ROOT'])));
-        $this->setWorkspace(workspace: realpath(path: strval(value: $_SERVER['WORKSPACE'])));
-
-        $this->setDoxygenfolder(doxygenfolder: realpath(path: $this->getDocumentroot() . DIRECTORY_SEPARATOR . 'doxygen'));
-        $this->setStaticfolder(staticfolder: realpath(path: $this->getDocumentroot() . DIRECTORY_SEPARATOR . 'static'));
-        $this->setStaticfolderBs(staticfolder_bs: realpath(path: $this->getDocumentroot() . DIRECTORY_SEPARATOR . 'static' . DIRECTORY_SEPARATOR . 'bs'));
+        $this->setDoxygenfolder($this->getDocumentroot() . DIRECTORY_SEPARATOR . 'doxygen');
+        $this->setStaticfolder($this->getDocumentroot() . DIRECTORY_SEPARATOR . 'static');
+        $this->setStaticfolderBs($this->getDocumentroot() . DIRECTORY_SEPARATOR . 'static' . DIRECTORY_SEPARATOR . 'bs');
 
         // Das sind "brauch man immer" Ordner
         $this->create_folder_if_not_exists(folder: $this->getDoxygenfolder());
@@ -712,12 +689,12 @@ class symlink
             $library_explode = explode('/', $library);
             if(!empty($library_explode[0]))
             {
-                $author = $library_explode[0];
+                $author  = $library_explode[0];
                 $library = $library_explode[1];
             }
             else
             {
-                $author = '';
+                $author  = '';
                 $library = $library_explode[1];
             }
         }
@@ -793,9 +770,9 @@ class symlink
         {
             try
             {
-                \symlink(target: $link['target'], link: $link['link']);
+                symlink(target: $link['target'], link: $link['link']);
             }
-            catch (\Throwable $e)
+            catch ( Throwable $e )
             {
                 logg($e);
                 \Sentry\captureException($e);
@@ -816,33 +793,33 @@ class symlink
         string $folder = "",
         int $permissions = 0755
     ): void {
-        $dirname = \dirname($folder);
+        $dirname = dirname($folder);
 
         // wir setzen die kringel 
         foreach($this->ordner_mit_kringel as $elem)
         {
-            $folder = \strval(value: $this->str_replace_last(search: "/replace: $elem", replace: "/@$elem", subject: $folder));
+            $folder = strval(value: $this->str_replace_last(search: "/replace: $elem", replace: "/@$elem", subject: $folder));
             // wenn oben kein dirname war, probieren wir noch einmal
             $dirname ??= dirname(path: $folder);
         }
         // does the folder exist? if yes skip
-        if(!\is_dir(filename: $folder) or empty(\realpath(path: $folder)))
+        if(!is_dir(filename: $folder) or empty(realpath(path: $folder)))
         {
             // ist the parent writable ?
-            if(!empty($dirname) and \is_dir(filename: $dirname) and \is_writable(filename: $dirname))
+            if(!empty($dirname) and is_dir(filename: $dirname) and is_writable(filename: $dirname))
             {
                 try
                 {
                     mkdir(directory: $folder, permissions: $permissions, recursive: true);
                 }
-                catch (\Throwable $exception)
+                catch ( Throwable $exception )
                 {
                     \Sentry\captureException($exception);
                 }
             }
             else
             {
-                \error_log(message: "can't write to $dirname <bR>");
+                error_log(message: "can't write to $dirname <bR>");
                 die("FILESYSTEM CRASHED " . __CLASS__ . '/' . __METHOD__ . ':' . __LINE__);
             }
         }
@@ -894,7 +871,7 @@ class symlink
 
         if(!in_array($vendor, $vendorArr))
         {
-            die("Can't check Libraries, vendor($vendor) not in vendorArr(" . \implode(separator: " ", array: $vendorArr) . ")");
+            die("Can't check Libraries, vendor($vendor) not in vendorArr(" . implode(separator: " ", array: $vendorArr) . ")");
         }
 
         if($vendor == "vendor")
@@ -907,18 +884,18 @@ class symlink
             $composerFile = "package.json";
         }
 
-        $vendorDir = "$this->workspace/$vendor/$library";
-        $isLibraryRequired = false;
+        $vendorDir          = "$this->workspace/$vendor/$library";
+        $isLibraryRequired  = false;
         $isLibraryInstalled = false;
 
         if(file_exists("$this->workspace/$composerFile") and $composerFile === "composer.json")
         {
-            $composerContent = json_decode(json: file_get_contents(filename: "$this->workspace/$composerFile"), associative: true);
+            $composerContent   = json_decode(json: file_get_contents(filename: "$this->workspace/$composerFile"), associative: true);
             $isLibraryRequired = isset($composerContent['require'][ $library ]);
         }
         elseif(file_exists("$this->workspace/$composerFile") and $composerFile === "package.json")
         {
-            $composerContent = json_decode(json: file_get_contents(filename: "$this->workspace/$composerFile"), associative: true);
+            $composerContent   = json_decode(json: file_get_contents(filename: "$this->workspace/$composerFile"), associative: true);
             $isLibraryRequired = isset($composerContent['dependencies'][ $library ]);
         }
         else
@@ -927,8 +904,7 @@ class symlink
         }
 
         // Check if the Bootstrap directory exists and is not empty
-        //$isLibraryInstalled = \is_dir(filename: $vendorDir) && (new FilesystemIterator(directory: "/$vendorDir", flags: FilesystemIterator::SKIP_DOTS))->valid();
-        $isLibraryInstalled = \is_dir($vendorDir) && !empty(scandir($vendorDir));
+        $isLibraryInstalled = is_dir(filename: $vendorDir) && (new FilesystemIterator(directory: "/$vendorDir", flags: FilesystemIterator::SKIP_DOTS))->valid();
 
         // conclusion
         if($isLibraryRequired && $isLibraryInstalled)
@@ -952,10 +928,10 @@ class symlink
     public static function detect_vendor(): bool
     {
         $vendor = null;
-        $vendor ??= \strval($_SERVER['VENDOR']);
-        $vendor ??= \strval(\realpath($_SERVER['DOCUMENT_ROOT'] . '/vendor'));
+        $vendor ??= \strval($_ENV['VENDOR']);
+        $vendor ??= \strval(realpath($_SERVER['DOCUMENT_ROOT'] . '/vendor'));
 
-        if(\is_readable(filename: \realpath(path: $vendor)))
+        if(is_readable(filename: realpath(path: $vendor)))
         {
             $_SERVER['VENDOR_EXISTS'] = true;
             return true;
@@ -975,7 +951,7 @@ class symlink
      * zB alle node module:          detect_framework_components(vendor:"node_modules") => jquery etc ...
      * 
      * @param string $library default : ecxod
-     * @param string $vendor_name default : $_SERVER['VENDOR']
+     * @param string $vendor_name default : $_ENV['VENDOR']
      * @return array|bool|string
      * @author Christian Eichert <c@zp1.net>
      * @version 1.0.0
@@ -1003,7 +979,7 @@ class symlink
         {
             if(!empty($library))
             {
-                $explode_library = \explode(separator: '/', string: $library, limit: 2);
+                $explode_library = explode(separator: '/', string: $library, limit: 2);
                 if(!empty($explode_library))
                 {
                     if(!empty($explode_library[0]))
@@ -1020,29 +996,29 @@ class symlink
             if(
                 self::detect_vendor() and
                 // wir pruefen ob der vendorname im vendorpfad ist
-                \str_contains(haystack: \strval(value: $_ENV['VENDOR']), needle: $vendorname)
+                str_contains(haystack: strval(value: $_ENV['VENDOR']), needle: $vendorname)
             )
             {
                 $subfolderpath =
                     (empty($library)) ?
-                    \realpath(path: $_ENV['VENDOR']) :
-                    \realpath(path: $_ENV['VENDOR'] . DIRECTORY_SEPARATOR . $project);
+                    realpath(path: $_ENV['VENDOR']) :
+                    realpath(path: $_ENV['VENDOR'] . DIRECTORY_SEPARATOR . $project);
 
-                if(\is_readable(filename: \strval(value: $_ENV['VENDOR'])) and \is_readable(filename: $subfolderpath))
+                if(is_readable(filename: strval(value: $_ENV['VENDOR'])) and is_readable(filename: $subfolderpath))
                 {
                     // Alle Dateien und Ordner in eine Array einlesen
-                    $result = \scandir(directory: $subfolderpath, sorting_order: SCANDIR_SORT_ASCENDING) ?? [];
+                    $result = scandir(directory: $subfolderpath, sorting_order: SCANDIR_SORT_ASCENDING) ?? [];
 
                     // wenn nichts ausser . und .. dann leere array (kein fehler kein false kein scheiss)
-                    $directories = \array_values(
-                        \array_diff(
-                            \is_array(value: $result) ? $result : [],
+                    $directories = array_values(
+                        array_diff(
+                            is_array(value: $result) ? $result : [],
                             [ '..', '.' ]
                         )
                     );
 
                     // Ausgangsformat erzeugen
-                    if(\in_array(needle: $output, haystack: $outputarray) and \gettype($directories) === 'array')
+                    if(in_array(needle: $output, haystack: $outputarray) and gettype($directories) === 'array')
                     {
                         if($output === "array")
                         {
@@ -1050,11 +1026,11 @@ class symlink
                         }
                         elseif($output === "json")
                         {
-                            return \json_encode(value: $directories);
+                            return json_encode(value: $directories);
                         }
                         elseif($output === "csv")
                         {
-                            return \implode(separator: ",", array: $directories);
+                            return implode(separator: ",", array: $directories);
                         }
                     }
                 }
