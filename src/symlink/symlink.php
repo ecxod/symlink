@@ -10,113 +10,9 @@ use \RuntimeException;
 use \Throwable;
 use function Ecxod\Funktionen\{m, logg, addIfNotExists};
 
-/** 
- * IMPORTANT : 
- * To grant write and execute permissions on the /raid/home/christian/wdrive/buchungssatz/public/static 
- * directory to the www-data user (as root)
- * setfacl -m u:www-data:rwX /raid/home/christian/wdrive/buchungssatz/public/static
- * 
- * install jquery
- * christian@black:/raid/home/christian/wdrive/buchungssatz $ npm install jquery
- * 
- * // TODO : Versionsmanagement einführen
- * 
- * @package symlink 
- * @author Christian Eichert <c@zp1.net>
- * @version 1.0.0
- */
+
 class symlink
 {
-    /**
-     * Das sind die Arrays der Ordner die die _link_ und _target_ Werte der Symlinks enthalten
-     * @var array
-     */
-    protected array  $chartjs;
-    protected array  $dist;
-    protected array  $font;
-    protected array  $icons;
-    protected array  $jquery;
-    protected array  $prismjs;
-    protected array  $popperjs;
-    protected array  $mathjax;
-    protected array  $tinymce;
-    protected array  $vendormodule;
-    protected array  $nodemodule;
-    protected array  $projektarr;
-    protected array  $symlink_array;
-    protected string $symlink_file;
-    protected string $symlink_json;
-
-    /**
-     * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
-     * @var string
-     */
-    protected string $workspace;
-    protected string $documentroot;
-    protected string $doxygenfolder;
-    protected string $staticfolder;
-    protected string $staticfolder_bs;
-    protected string $popperfolder;
-
-    /**
-     * Das sind ordner die mit einem @ beginnen sollen wegen kompatibilität mit npm
-     * @var array
-     */
-    protected array $ordner_mit_kringel;
-
-    /**
-     * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
-     * @return string
-     */
-    public function getWorkspace(): string
-    {
-        return $this->workspace;
-    }
-
-    /**
-     * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
-     * @param string $workspace Das sind string-werte der ordner in den die symlinks erstellt werden sollen
-     * @return void
-     */
-    public function setWorkspace(string $workspace): void
-    {
-        $this->workspace = $workspace;
-    }
-
-    /**
-     * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
-     * @return string
-     */
-    public function getDocumentroot(): string
-    {
-        return $this->documentroot;
-    }
-
-    /**
-     * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
-     * @param string $documentroot Das sind string-werte der ordner in den die symlinks erstellt werden sollen
-     * @return void
-     */
-    public function setDocumentroot(string $documentroot): void
-    {
-        $this->documentroot = $documentroot;
-    }
-
-    /**
-     * Das sind string-werte der ordner in den die symlinks erstellt werden sollen
-     * @return string
-     */
-    public function getDoxygenfolder(): string
-    {
-        return $this->doxygenfolder;
-    }
-
-
-
- 
-
-
-
 
 
 
@@ -132,323 +28,121 @@ class symlink
 
         $this->create_symlink_example();
 
-        // $_SERVER['WORKSPACE'] ??= strval(realpath($_SERVER['DOCUMENT_ROOT'] . "/../"));
-
-        // $_ENV['VENDOR'] ??= $_SERVER['WORKSPACE'] . DIRECTORY_SEPARATOR . 'vendor';
-        // $this->symlink_file = $_SERVER['WORKSPACE'] . DIRECTORY_SEPARATOR . 'symlink.json';
-        // // echo $this->symlink_file;
-
-        // if(!empty($this->symlink_file) and is_readable($this->symlink_file))
-        // {
-        //     $this->symlink_json  = file_get_contents($this->symlink_file);
-        //     $this->symlink_array = json_decode(json: $this->symlink_json, associative: true, flags: JSON_OBJECT_AS_ARRAY);
-
-        //     // #print_r($this->symlink_file);
-        //     // #print_r($this->symlink_array);
-
-        //     // if(is_array($this->symlink_array))
-        //     // {
-        //     //     $projektarr = [];
-        //     //     foreach($this->symlink_array as $key => $val)
-        //     //     {
-        //     //         if(!empty($val))
-        //     //         {
-        //     //             $projektarr += [ $key ];
-        //     //         }
-        //     //     }
-        //     //     if(empty($projektarr))
-        //     //     {
-        //     //         error_log("ERROR: EMPTY SYMLINK (we will make no symlinks)");
-        //     //     }
-        //     //     $this->setProjektarr(projektarr: $projektarr);
-        //     // }
-        // }
-        // else
-        // {
-        //     die("ERROR: UNDOCUMENTED SYMLINK - create a \"symlink.json\" file in the project base folder, netx to the vendor folder.");
-        // }
-
-
-        // /**
-        //  * // TODO: In diese Array kommen alle Ordner mit Kringel
-        //  */
-        // $this->setOrdnerMitKringel(ordner_mit_kringel: [ "popperjs" ]);
-
-        // if(empty($_SERVER['DOCUMENT_ROOT']))
-        // {
-        //     die("ERROR: UNDOCUMENTED DOCUMENT_ROOT");
-        // }
-
-        // $this->setDocumentroot($_SERVER['DOCUMENT_ROOT']);
-        // $this->setWorkspace($_SERVER['WORKSPACE']);
-
-        // $this->setDoxygenfolder($this->getDocumentroot() . DIRECTORY_SEPARATOR . 'doxygen');
-        // $this->setStaticfolder($this->getDocumentroot() . DIRECTORY_SEPARATOR . 'static');
-        // $this->setStaticfolderBs($this->getDocumentroot() . DIRECTORY_SEPARATOR . 'static' . DIRECTORY_SEPARATOR . 'bs');
-
-        // // Das sind "brauch man immer" Ordner
-        // $this->create_folder_if_not_exists(folder: $this->getDoxygenfolder());
-        // $this->create_folder_if_not_exists(folder: $this->getStaticfolder());
-        // $this->create_folder_if_not_exists(folder: $this->getStaticfolderBs());
-
-        // // TODO: es gibt ordner in env die sollten von einer function erzeugt werden
-        // $this->check_and_create_folder_if_not_exists(folder: '@popperjs', library: "@popperjs", vendor: "node_modules");
-        // $this->check_and_create_folder_if_not_exists(folder: "bs", library: "twbs/bootstrap", vendor: "vendor");
-        // $this->check_and_create_folder_if_not_exists(folder: "css");
-        // $this->check_and_create_folder_if_not_exists(folder: 'phcss');
-        // $this->check_and_create_folder_if_not_exists(folder: 'js');
-        // $this->check_and_create_folder_if_not_exists(folder: 'img');
-
-        // $this->setVendormodules(vendormodule: $this->detect_framework_components(vendor_name: "vendor"));
-        // $this->setNodemodules(nodemodule: $this->detect_framework_components(vendor_name: "node_modules"));
-
-
-
-
-        // /**
-        //  "twbs/bootstrap"
-        //  */
-        // if(
-        //     // physisch vorhanden
-        //     \in_array(needle: "twbs/bootstrap", haystack: $this->getVendormodules()) and
-        //     // gewuenscht in .env
-        //     \in_array(needle: "twbs/bootstrap", haystack: $this->getProjektarr())
-        // )
-        // {
-        //     // wir bestimmen die Link source und destination als array of strings
-        //     $this->setDist($this->checkLibraryInstallation(library: "twbs/bootstrap", vendor: "vendor") ? [ 
-        //         'link'   => $this->makeLink(folder: 'bs', subfolder: 'dist'),
-        //         'target' => $this->makeTarget(vendor: 'vendor', library: 'twbs/bootstrap-icons', folder: 'dist'),
-        //     ] : []);
-        //     // wir erzeugen den Link
-        //     empty($this->getDist()) ? null : $this->create_symlink(link: $this->getDist());
-        // }
-
-        // /**
-        //  "twbs/bootstrap-icons"
-        //  */
-        // if(
-        //     \in_array(needle: "twbs/bootstrap-icons", haystack: $this->getVendormodules()) and
-        //     \in_array(needle: "twbs/bootstrap-icons", haystack: $this->getProjektarr())
-        // )
-        // {
-        //     $this->setFont(
-        //         font: $this->checkLibraryInstallation(library: "twbs/bootstrap-icons", vendor: "vendor") ? [ 
-        //             'link'   => $this->makeLink(folder: 'bs', subfolder: 'font'),
-        //             'target' => $this->makeTarget(vendor: 'vendor', library: 'twbs/bootstrap-icons', folder: 'font'),
-        //         ] : []
-        //     );
-        //     empty($this->getFont()) ? null : $this->create_symlink(link: $this->getFont());
-
-        //     $this->setIcons($this->checkLibraryInstallation(library: "twbs/bootstrap-icons", vendor: "vendor") ? [ 
-        //         'link'   => $this->makeLink(folder: 'bs', subfolder: 'icons'),
-        //         'target' => $this->makeTarget(vendor: 'vendor', library: 'twbs/bootstrap-icons', folder: 'icons'),
-        //     ] : []);
-        //     empty($this->getIcons()) ? null : $this->create_symlink(link: $this->getIcons());
-        // }
-
-        // /**
-        //  "jquery"
-        //  */
-        // if(
-        //     \in_array(needle: "jquery", haystack: $this->getNodemodules()) and
-        //     \in_array(needle: "jquery", haystack: $this->getProjektarr())
-        // )
-        // {
-        //     $this->setJquery(
-        //         jquery: $this->checkLibraryInstallation(library: "jquery", vendor: "node_modules") ? [ 
-        //             'link'   => $this->makeLink(folder: 'jquery'),
-        //             'target' => $this->makeTarget(vendor: 'node_modules', library: 'jquery', folder: 'dist'),
-        //         ] : []
-        //     );
-        //     empty($this->getJquery()) ? null : $this->create_symlink(link: $this->getJquery());
-        // }
-
-        // /**
-        //  "prismjs"
-        //  */
-        // if(
-        //     \in_array(needle: "prismjs", haystack: $this->getNodemodules()) and
-        //     \in_array(needle: "prismjs", haystack: $this->getProjektarr())
-        // )
-        // {
-        //     $this->setPrismjs(
-        //         prismjs: $this->checkLibraryInstallation(library: "prismjs", vendor: "node_modules") ? [ 
-        //             'link'   => $this->makeLink(folder: 'prismjs'),
-        //             'target' => $this->makeTarget(vendor: 'node_modules', library: 'prismjs'),
-        //         ] : []
-        //     );
-        //     empty($this->prismjs) ? null : $this->create_symlink(link: $this->prismjs);
-        // }
-
-        // /**
-        //  "mathjax"
-        //  */
-        // if(
-        //     \in_array(needle: "mathjax", haystack: $this->getNodemodules()) and
-        //     \in_array(needle: "mathjax", haystack: $this->getProjektarr())
-        // )
-        // {
-        //     $this->setMathjax(
-        //         mathjax: $this->checkLibraryInstallation(library: "mathjax", vendor: "node_modules") ? [ 
-        //             'link'   => $this->makeLink(folder: 'mathjax'),
-        //             'target' => $this->makeTarget(vendor: 'node_modules', library: 'mathjax'),
-        //         ] : []
-        //     );
-        //     empty($this->getMathjax()) ? null : $this->create_symlink(link: $this->getMathjax());
-        // }
-
-        // /**
-        //  "popperjs"
-        //  */
-        // if(
-        //     \in_array(needle: "@popperjs", haystack: $this->getNodemodules()) and
-        //     \in_array(needle: "@popperjs", haystack: $this->getProjektarr())
-        // )
-        // {
-        //     $this->setPopperjs(
-        //         popperjs: $this->checkLibraryInstallation(library: "@popperjs", vendor: "node_modules") ? [ 
-        //             'link'   => $this->makeLink(folder: '@popperjs', subfolder: 'core'),
-        //             'target' => $this->makeTarget(vendor: 'node_modules', library: '@popperjs', folder: 'core'),
-        //         ] : []
-        //     );
-        //     empty($this->getPopperjs()) ? null : $this->create_symlink(link: $this->getPopperjs());
-        // }
-
-        // /**
-        //  "tinymce"
-        //  */
-        // if(
-        //     \in_array(needle: "tinymce", haystack: $this->getNodemodules()) and
-        //     \in_array(needle: "tinymce", haystack: $this->getProjektarr())
-        // )
-        // {
-        //     $this->setTinymce(
-        //         tinymce: $this->checkLibraryInstallation(library: "tinymce", vendor: "node_modules") ? [ 
-        //             'link'   => $this->makeLink(folder: 'tinymce'),
-        //             'target' => $this->makeTarget(vendor: 'node_modules', library: 'tinymce'),
-        //         ] : []
-        //     );
-        //     empty($this->getTinymce()) ? null : $this->create_symlink(link: $this->getTinymce());
-        // }
-
-        // /**
-        //  "chartjs"
-        //  */
-        // if(
-        //     \in_array(needle: "chartjs", haystack: $this->getNodemodules()) and
-        //     \in_array(needle: "chartjs", haystack: $this->getProjektarr())
-        // )
-        // {
-        //     $this->setChartjs(
-        //         chartjs: $this->checkLibraryInstallation(library: "chartjs", vendor: "node_modules") ? [ 
-        //             'link'   => $this->makeLink(folder: 'chartjs'),
-        //             'target' => $this->makeTarget(vendor: 'node_modules', library: 'chartjs'),
-        //         ] : []
-        //     );
-        //     empty($this->getChartjs()) ? null : $this->create_symlink(link: $this->getChartjs());
-        // }
 
     }
 
 
-    /**
-     * Erstellt oder aktualisiert symlink-example.json mit Abhängigkeiten aus composer.json und package.json.
-     * Setzt alle Werte auf false und überspringt die Erstellung, wenn die Datei aktuell ist.
-     *
-     * @throws RuntimeException Bei Problemen mit Dateizugriff
-     * @throws JsonException Bei ungültigem JSON
-     * @return void
-     */
+    protected function getWorkspace()
+    {
+        $workspace = realpath($_SERVER['DOCUMENT_ROOT'] . "/..");
+        if($workspace === false)
+        {
+            throw new RuntimeException("Ungültiger Workspace-Pfad");
+        }
+        $_ENV['WORKSPACE'] ??= $workspace;
+        return $workspace;
+    }
+
+
     protected function create_symlink_example()
     {
-        try {
-            // Ermittle Workspace-Pfad
-            $workspace = realpath($_SERVER['DOCUMENT_ROOT'] . "/..");
-            if ($workspace === false) {
-                throw new RuntimeException("Ungültiger Workspace-Pfad");
-            }
-            $_ENV['WORKSPACE'] ??= $workspace;
-    
+        try
+        {
+
             // Pfade zu den JSON-Dateien
-            $composer_json = $_ENV['WORKSPACE'] . DIRECTORY_SEPARATOR . 'composer.json';
-            $package_json = $_ENV['WORKSPACE'] . DIRECTORY_SEPARATOR . 'package.json';
-            $symlink_example_existent = $_ENV['WORKSPACE'] . DIRECTORY_SEPARATOR . 'symlink-example.json';
-    
+            $composer_json            = $this->getWorkspace() . DIRECTORY_SEPARATOR . 'composer.json';
+            $package_json             = $this->getWorkspace() . DIRECTORY_SEPARATOR . 'package.json';
+            $symlink_example_existent = $this->getWorkspace() . DIRECTORY_SEPARATOR . 'symlink-example.json';
+
             // Prüfe und lese composer.json
-            if (!file_exists($composer_json) || !is_readable($composer_json)) {
+            if(!file_exists($composer_json) || !is_readable($composer_json))
+            {
                 throw new RuntimeException("composer.json nicht gefunden oder nicht lesbar");
             }
             $composer_content = file_get_contents($composer_json);
-            if ($composer_content === false) {
+            if($composer_content === false)
+            {
                 throw new RuntimeException("Konnte composer.json nicht lesen");
             }
             $composer_obj = json_decode($composer_content, true, 512, JSON_INVALID_UTF8_SUBSTITUTE);
-            if (json_last_error() !== JSON_ERROR_NONE) {
+            if(json_last_error() !== JSON_ERROR_NONE)
+            {
                 throw new JsonException("Ungültiges JSON in composer.json: " . json_last_error_msg());
             }
-    
+
             // Prüfe und lese package.json
-            if (!file_exists($package_json) || !is_readable($package_json)) {
+            if(!file_exists($package_json) || !is_readable($package_json))
+            {
                 throw new RuntimeException("package.json nicht gefunden oder nicht lesbar");
             }
             $package_content = file_get_contents($package_json);
-            if ($package_content === false) {
+            if($package_content === false)
+            {
                 throw new RuntimeException("Konnte package.json nicht lesen");
             }
             $package_obj = json_decode($package_content, true, 512, JSON_INVALID_UTF8_SUBSTITUTE);
-            if (json_last_error() !== JSON_ERROR_NONE) {
+            if(json_last_error() !== JSON_ERROR_NONE)
+            {
                 throw new JsonException("Ungültiges JSON in package.json: " . json_last_error_msg());
             }
-    
+
             // Prüfe erforderliche Schlüssel
-            if (!isset($composer_obj['require'], $package_obj['dependencies'])) {
+            if(!isset($composer_obj['require'], $package_obj['dependencies']))
+            {
                 throw new RuntimeException("Erforderliche Schlüssel 'require' oder 'dependencies' fehlen");
             }
-    
+
             // Setze alle Werte in require und dependencies auf false
-            $require_modified = array_map(fn($value) => false, $composer_obj['require']);
+            $require_modified      = array_map(fn($value) => false, $composer_obj['require']);
             $dependencies_modified = array_map(fn($value) => false, $package_obj['dependencies']);
-    
+
             // Erstelle kombiniertes JSON-Datenarray
-            $symlink_data = [
-                'require' => $require_modified,
+            $symlink_data = [ 
+                'require'      => $require_modified,
                 'dependencies' => $dependencies_modified,
             ];
-    
+
             // Prüfe, ob symlink-example.json existiert und aktuell ist
             $symlink_example_existent_object = null;
-            if (file_exists($symlink_example_existent) && is_readable($symlink_example_existent)) {
+            if(file_exists($symlink_example_existent) && is_readable($symlink_example_existent))
+            {
                 $symlink_example_existent_content = file_get_contents($symlink_example_existent);
-                if ($symlink_example_existent_content === false) {
+                if($symlink_example_existent_content === false)
+                {
                     throw new RuntimeException("Konnte symlink-example.json nicht lesen");
                 }
                 $symlink_example_existent_object = json_decode($symlink_example_existent_content, true, 512, JSON_INVALID_UTF8_SUBSTITUTE);
-                if (json_last_error() !== JSON_ERROR_NONE) {
+                if(json_last_error() !== JSON_ERROR_NONE)
+                {
                     throw new JsonException("Ungültiges JSON in symlink-example.json: " . json_last_error_msg());
                 }
                 // Vergleiche die Daten direkt, um doppelte Kodierung zu vermeiden
-                if ($symlink_data === $symlink_example_existent_object) {
+                if($symlink_data === $symlink_example_existent_object)
+                {
                     return; // Datei ist aktuell
                 }
             }
-    
+
             // Prüfe Schreibrechte
             $symlink_dir = dirname($symlink_example_existent);
-            if (!is_writable($symlink_dir)) {
+            if(!is_writable($symlink_dir))
+            {
                 throw new RuntimeException("Verzeichnis für symlink-example.json ist nicht beschreibbar");
             }
-            
+
 
 
             // Kodiere die Daten nur einmal und schreibe die Ausgabedatei
             $symlink_json = json_encode($symlink_data, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
-            $symlink_json = str_replace('\/','/',$symlink_json);
+            $symlink_json = str_replace('\/', '/', $symlink_json);
 
-            if (file_put_contents($symlink_example_existent, $symlink_json) === false) {
+            if(file_put_contents($symlink_example_existent, $symlink_json) === false)
+            {
                 throw new RuntimeException("Konnte symlink-example.json nicht schreiben");
             }
-        } catch (Exception $e) {
+        }
+        catch ( Exception $e )
+        {
             error_log("Fehler: " . $e->getMessage());
             exit("Ein Fehler ist aufgetreten: " . $e->getMessage());
         }
@@ -459,394 +153,77 @@ class symlink
 
 
 
-    
-    // /** makes the string that contains the Link 
-    //  * @param string $folder 
-    //  * @param string|null $subfolder 
-    //  * @return string 
-    //  * @author Christian Eichert <c@zp1.net>
-    //  * @version 1.0.0
-    //  */
-    // protected function makeLink(string $folder, string $subfolder = null): string
-    // {
-    //     if(empty($folder))
-    //         die('ERROR: ' . __CLASS__ . "/" . __METHOD__ . ":" . __LINE__);
+    public function setSymlinksFromJson($jsonString, $baseSourcePath)
+    {
+        // JSON dekodieren
+        $data = json_decode($jsonString, true);
 
-    //     return realpath(
-    //         path: $this->getStaticfolder() .
-    //         DIRECTORY_SEPARATOR . $folder .
-    //         (empty($subfolder) ? '' : DIRECTORY_SEPARATOR . $subfolder)
-    //     );
-    // }
+        if($data === null)
+        {
+            throw new Exception("Ungültiges JSON-Format");
+        }
 
-    // /** makes string that contains the target for the link
-    //  * @param string $vendor 
-    //  * @param string $library 
-    //  * @param string|null $folder 
-    //  * @return string 
-    //  * @author Christian Eichert <c@zp1.net>
-    //  * @version 1.0.0
-    //  */
-    // protected function makeTarget(string $vendor, string $library, string $folder = null)
-    // {
-    //     if(empty($vendor) or empty($library))
-    //     {
-    //         die('ERROR: ' . __CLASS__ . "/" . __METHOD__ . ":" . __LINE__);
-    //     }
+        // Durch die erste Ebene iterieren (z.B. "node_modules", "vendor")
+        foreach($data as $rootKey => $rootValue)
+        {
+            // Durch die zweite Ebene iterieren (Tiefe 2)
+            if(is_array($rootValue))
+            {
+                foreach($rootValue as $key => $value)
+                {
+                    // Prüfen, ob der Wert mit "public" beginnt
+                    if(is_string($value) && strpos($value, 'public') === 0)
+                    {
+                        // Quellpfad: Kombination aus Base-Pfad, rootKey und key
+                        $sourcePath = $baseSourcePath . DIRECTORY_SEPARATOR . $rootKey . DIRECTORY_SEPARATOR . $key;
+                        // Zielpfad: Der Wert aus dem JSON
+                        $targetPath = $value;
 
-    //     if(str_contains(haystack: $library, needle: '/'))
-    //     {
-    //         $library_explode = explode('/', $library);
-    //         if(!empty($library_explode[0]))
-    //         {
-    //             $author  = $library_explode[0];
-    //             $library = $library_explode[1];
-    //         }
-    //         else
-    //         {
-    //             $author  = '';
-    //             $library = $library_explode[1];
-    //         }
-    //     }
+                        // Prüfen, ob die Quelle existiert
+                        if(!file_exists($sourcePath))
+                        {
+                            echo "Quelle existiert nicht: $sourcePath\n";
+                            continue;
+                        }
 
-    //     return realpath(
-    //         path: $this->getWorkspace() .
-    //         DIRECTORY_SEPARATOR . $vendor .
-    //         (empty($author) ? '' : DIRECTORY_SEPARATOR . $author) .
-    //         DIRECTORY_SEPARATOR . $library .
-    //         (empty($folder) ? '' : DIRECTORY_SEPARATOR . $folder)
-    //     ) . DIRECTORY_SEPARATOR;
-    // }
+                        // Prüfen, ob der Zielpfad bereits existiert
+                        if(file_exists($targetPath))
+                        {
+                            echo "Ziel existiert bereits: $targetPath\n";
+                            continue;
+                        }
 
+                        // Verzeichnis für den Zielpfad erstellen, falls nötig
+                        $targetDir = dirname($targetPath);
+                        if(!is_dir($targetDir))
+                        {
+                            mkdir($targetDir, 0755, true);
+                        }
 
-    // /**
-    //  * @param string $folder 
-    //  * @param string|null $library 
-    //  * @param string|null $composerFile 
-    //  * @param string|null $vendor 
-    //  * @param int $permissions 
-    //  * @return void 
-    //  * @author Christian Eichert <c@zp1.net>
-    //  * @version 1.0.0
-    //  */
-    // public function check_and_create_folder_if_not_exists(
-    //     string $folder,
-    //     string $library = null,
-    //     string $vendor = null,
-    //     int $permissions = 0755
-    // ): void {
-
-    //     if($folder === 'POPPERJS')
-    //     {
-    //         $folder = '@POPPERJS';
-    //     }
-
-    //     /** Wir machen den Folder weil es eine Library ist */
-    //     if(!empty($folder) and !empty($library) and !empty($vendor) and $this->checkLibraryInstallation(library: $library, vendor: $vendor))
-    //     {
-    //         $completefolder = $this->staticfolder . DIRECTORY_SEPARATOR . ltrim(string: strtolower(string: $folder), characters: 'f');
-    //         $this->create_folder_if_not_exists(folder: $completefolder, permissions: $permissions);
-    //         /** Wir machen den Ordner sowieso auch wenn keine Library */
-    //     }
-    //     elseif(!empty($folder) and empty($library) and empty($vendor))
-    //     {
-    //         $completefolder = $this->staticfolder . DIRECTORY_SEPARATOR . ltrim(string: strtolower(string: $folder), characters: 'f');
-    //         $this->create_folder_if_not_exists(folder: $completefolder, permissions: $permissions);
-    //     }
-    // }
-
-    // /**
-    //  * @param array $link 
-    //  * @return void 
-    //  * @author Christian Eichert <c@zp1.net>
-    //  * @version 1.0.0
-    //  */
-    // public function create_symlink(
-    //     array $link
-    // ): void {
-
-    //     // if (is_link(filename: $link['link']) and readlink(path: $link['link']) ===  $link['target']) {
-    //     //     return;
-    //     // }
-
-    //     if(
-    //         // wenn es noch keinen link gibt oder wenn der link nicht auf target zielt
-    //         !is_link(filename: $link['link'])
-    //         and
-    //             // wenn es aber ein target gibt
-    //         (!empty(realpath(path: $link['target'])) and realpath(path: $link['target']) !== '/')
-
-    //     )
-    //     {
-    //         try
-    //         {
-    //             symlink(target: $link['target'], link: $link['link']);
-    //         }
-    //         catch ( Throwable $e )
-    //         {
-    //             logg($e);
-    //             \Sentry\captureException($e);
-    //         }
-    //     }
-    // }
-
-    // /** The method does 2 things :
-    //  * - create a folder if not exists
-    //  * - rename the _folder_ in _@folder_ if he is the ordner_mit_kringel array
-    //  * @param string $folder 
-    //  * @param int $permissions 
-    //  * @return void 
-    //  * @author Christian Eichert <c@zp1.net>
-    //  * @version 1.0.0
-    //  */
-    // public function create_folder_if_not_exists(
-    //     string $folder = "",
-    //     int $permissions = 0755
-    // ): void {
-    //     $dirname = dirname($folder);
-
-    //     // wir setzen die kringel 
-    //     foreach($this->ordner_mit_kringel as $elem)
-    //     {
-    //         $folder = strval(value: $this->str_replace_last(search: "/replace: $elem", replace: "/@$elem", subject: $folder));
-    //         // wenn oben kein dirname war, probieren wir noch einmal
-    //         $dirname ??= dirname(path: $folder);
-    //     }
-    //     // does the folder exist? if yes skip
-    //     if(!is_dir(filename: $folder) or empty(realpath(path: $folder)))
-    //     {
-    //         // ist the parent writable ?
-    //         if(!empty($dirname) and is_dir(filename: $dirname) and is_writable(filename: $dirname))
-    //         {
-    //             try
-    //             {
-    //                 mkdir(directory: $folder, permissions: $permissions, recursive: true);
-    //             }
-    //             catch ( Throwable $exception )
-    //             {
-    //                 \Sentry\captureException($exception);
-    //             }
-    //         }
-    //         else
-    //         {
-    //             error_log(message: "can't write to $dirname <bR>");
-    //             die("FILESYSTEM CRASHED " . __CLASS__ . '/' . __METHOD__ . ':' . __LINE__);
-    //         }
-    //     }
-    // }
+                        // Symbolischen Link erstellen
+                        if(symlink($sourcePath, $targetPath))
+                        {
+                            echo "Symlink erstellt: $sourcePath -> $targetPath\n";
+                        }
+                        else
+                        {
+                            echo "Fehler beim Erstellen des Symlinks: $sourcePath -> $targetPath\n";
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 
-    // /** Replace the last occurence only
-    //  * @param string $search 
-    //  * @param string $replace 
-    //  * @param string|array $subject 
-    //  * @return string|array 
-    //  * @author Christian Eichert <c@zp1.net>
-    //  * @version 1.0.0
-    //  */
-    // public function str_replace_last(
-    //     string $search,
-    //     string $replace,
-    //     array|string $subject
-    // ): array|string {
-    //     $pos = \strrpos(haystack: $subject, needle: $search);
-    //     return
-    //         ($pos !== false) ?
-    //         \substr_replace(
-    //             string: $subject,
-    //             replace: $replace,
-    //             offset: $pos,
-    //             length: \strlen(string: $search)
-    //         ) :
-    //         $subject;
-    // }
-
-    // /** 
-    //  * Checks if a PHP Library is installed in **vendor** and is also required in **composer.json**  
-    //  * returns *true* if installed and *false* if not installed
-    //  * 
-    //  * @param string $library 
-    //  * @param string $composerFile 
-    //  * @param string $vendor 
-    //  * @return bool 
-    //  * @author Christian Eichert <c@zp1.net>
-    //  * @version 1.0.0
-    //  */
-    // public function checkLibraryInstallation(
-    //     string $library,
-    //     string $vendor
-    // ): bool {
-
-    //     $vendorArr = [ "vendor", "node_modules" ];
-
-    //     if(!in_array($vendor, $vendorArr))
-    //     {
-    //         die("Can't check Libraries, vendor($vendor) not in vendorArr(" . implode(separator: " ", array: $vendorArr) . ")");
-    //     }
-
-    //     if($vendor == "vendor")
-    //     {
-    //         $composerFile = "composer.json";
-    //     }
-
-    //     if($vendor == "node_modules")
-    //     {
-    //         $composerFile = "package.json";
-    //     }
-
-    //     $vendorDir          = "$this->workspace/$vendor/$library";
-    //     $isLibraryRequired  = false;
-    //     $isLibraryInstalled = false;
-
-    //     if(file_exists("$this->workspace/$composerFile") and $composerFile === "composer.json")
-    //     {
-    //         $composerContent   = json_decode(json: file_get_contents(filename: "$this->workspace/$composerFile"), associative: true);
-    //         $isLibraryRequired = isset($composerContent['require'][ $library ]);
-    //     }
-    //     elseif(file_exists("$this->workspace/$composerFile") and $composerFile === "package.json")
-    //     {
-    //         $composerContent   = json_decode(json: file_get_contents(filename: "$this->workspace/$composerFile"), associative: true);
-    //         $isLibraryRequired = isset($composerContent['dependencies'][ $library ]);
-    //     }
-    //     else
-    //     {
-    //         $isLibraryRequired = false;
-    //     }
-
-    //     // Check if the Bootstrap directory exists and is not empty
-    //     $isLibraryInstalled = is_dir(filename: $vendorDir) && (new FilesystemIterator(directory: "/$vendorDir", flags: FilesystemIterator::SKIP_DOTS))->valid();
-
-    //     // conclusion
-    //     if($isLibraryRequired && $isLibraryInstalled)
-    //     {
-    //         // echo "### $library is installed.<br>";
-    //         return true;
-    //     }
-    //     else
-    //     {
-    //         // echo "### $library is not installed.<br>";
-    //         return false;
-    //     }
-    // }
-
-    // /**
-    //  * Check if the vendor exists and is readable 
-    //  * @return bool 
-    //  * @author Christian Eichert <c@zp1.net>
-    //  * @version 1.0.0
-    //  */
-    // public static function detect_vendor(): bool
-    // {
-    //     $vendor = null;
-    //     $vendor ??= \strval($_ENV['VENDOR']);
-    //     $vendor ??= \strval(realpath($_SERVER['DOCUMENT_ROOT'] . '/vendor'));
-
-    //     if(is_readable(filename: realpath(path: $vendor)))
-    //     {
-    //         $_SERVER['VENDOR_EXISTS'] = true;
-    //         return true;
-    //     }
-    //     else
-    //     {
-    //         $_SERVER['VENDOR_EXISTS'] = false;
-    //         return false;
-    //     }
-    // }
-
-    // /**
-    //  * return all installed pakets of a framework, or false if none
-    //  * 
-    //  * zB alle composer module:      detect_framework_components(vendor:"vendor") => composer, ecxod, etc ...
-    //  * zB alle komponenten in ecxod: detect_framework_components(subfolder:"ecxod", vendor:"vendor") => symlink, funktionen etc ...
-    //  * zB alle node module:          detect_framework_components(vendor:"node_modules") => jquery etc ...
-    //  * 
-    //  * @param string $library default : ecxod
-    //  * @param string $vendor_name default : $_ENV['VENDOR']
-    //  * @return array|bool|string
-    //  * @author Christian Eichert <c@zp1.net>
-    //  * @version 1.0.0
-    //  */
-    // public function detect_framework_components($library = "", string $vendor_name = null, string $output = "array"): array|bool|string
-    // {
-    //     // enthaelt die relativen pfade der vendoren
-    //     $vendorfolder_array = [ "vendor", "node_modules" ];
-    //     // das resultat wird als arr, json oder cvs ausgegeben
-    //     $outputarray = [ "array", "json", "csv" ];
 
 
-    //     $project = "";
-
-    //     // library in node_modules is like project
-    //     if($vendor_name === 'node_modules')
-    //     {
-    //         if(!empty($library))
-    //         {
-    //             $project = $library;
-    //         }
-    //     }
-    //     // library in vendor is like author/project
-    //     if($vendor_name === 'vendor')
-    //     {
-    //         if(!empty($library))
-    //         {
-    //             $explode_library = explode(separator: '/', string: $library, limit: 2);
-    //             if(!empty($explode_library))
-    //             {
-    //                 if(!empty($explode_library[0]))
-    //                     // wenn im vendor library nicht leer ist author und project immer gegeben
-    //                     $project = $explode_library[0];
-    //             }
-    //         }
-    //     }
 
 
-    //     foreach($vendorfolder_array as $vendorname)
-    //     {
 
-    //         if(
-    //             self::detect_vendor() and
-    //             // wir pruefen ob der vendorname im vendorpfad ist
-    //             str_contains(haystack: strval(value: $_ENV['VENDOR']), needle: $vendorname)
-    //         )
-    //         {
-    //             $subfolderpath =
-    //                 (empty($library)) ?
-    //                 realpath(path: $_ENV['VENDOR']) :
-    //                 realpath(path: $_ENV['VENDOR'] . DIRECTORY_SEPARATOR . $project);
 
-    //             if(is_readable(filename: strval(value: $_ENV['VENDOR'])) and is_readable(filename: $subfolderpath))
-    //             {
-    //                 // Alle Dateien und Ordner in eine Array einlesen
-    //                 $result = scandir(directory: $subfolderpath, sorting_order: SCANDIR_SORT_ASCENDING) ?? [];
 
-    //                 // wenn nichts ausser . und .. dann leere array (kein fehler kein false kein scheiss)
-    //                 $directories = array_values(
-    //                     array_diff(
-    //                         is_array(value: $result) ? $result : [],
-    //                         [ '..', '.' ]
-    //                     )
-    //                 );
 
-    //                 // Ausgangsformat erzeugen
-    //                 if(in_array(needle: $output, haystack: $outputarray) and gettype($directories) === 'array')
-    //                 {
-    //                     if($output === "array")
-    //                     {
-    //                         return $directories;
-    //                     }
-    //                     elseif($output === "json")
-    //                     {
-    //                         return json_encode(value: $directories);
-    //                     }
-    //                     elseif($output === "csv")
-    //                     {
-    //                         return implode(separator: ",", array: $directories);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return false;
-    // }
+
 
 }
