@@ -1,0 +1,6 @@
+.git
+.hgignore
+.env
+node_modules
+vendor
+wiki
