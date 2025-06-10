@@ -106,19 +106,25 @@ If you are familiar with the JSON file structure, all you need to know is that t
 {
     "node_modules": {
         "chartjs": false,
-        "jquery/dist": [ "dist" => "public/static/@jquery/dist" ],
+        "jquery": {
+            "dist": "public/static/@jquery/dist"
+        },
         "mathjax": false,
         "popperjs": false,
-        "prismjs": [ "" => "public/static/prismjs" ],
+        "prismjs": {
+            "": "public/static/prismjs"
+        },
         "stackblitz": false,
         "tinymce": false
     },
     "vendor": {
-        "twbs/bootstrap": [ "dist" => "public/static/bs/dist" ],
-        "twbs/bootstrap-icons": [ 
-            "font" => "public/static/bs/font", 
-            "icons" => "public/static/bs/icons"
-        ]
+        "twbs/bootstrap": {
+            "dist": "public/static/bs/dist"
+        },
+        "twbs/bootstrap-icons": {
+            "font": "public/static/bs/font",
+            "icons": "public/static/bs/icons"
+        }
     }
 }
 ```
