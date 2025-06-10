@@ -23,7 +23,9 @@
         "php": "^7.2|^7.4|^8.0|^8.2",
         "sentry/sentry": "^4.8",
         "vlucas/phpdotenv": "^5.6",
-        "ecxod/funktionen": "^1.0"
+        "ecxod/funktionen": "^1.0",
+        "twbs/bootstrap": "^5.3",
+        "twbs/bootstrap-icons": "^1.13"
     },
     "archive": {
         "exclude": [
