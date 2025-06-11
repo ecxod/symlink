@@ -83,18 +83,16 @@ When you first run the library, it creates and continuously updates a file calle
 ### cat symlink-example.json
 ```json
 {
-    "node_modules": {
-        "chartjs": false,
-        "jquery/dist": false,
-        "mathjax": false,
-        "popperjs": false,
-        "prismjs": false,
-        "stackblitz": false,
-        "tinymce": false
-    },
-    "vendor": {
+    "require": {
+        "php": false,
+        "sentry/sentry": false,
+        "vlucas/phpdotenv": false,
         "twbs/bootstrap": false,
         "twbs/bootstrap-icons": false
+    },
+    "dependencies": {
+        "jquery": false,
+        "prismjs": false
     }
 }
 ```
@@ -104,20 +102,10 @@ If you are familiar with the JSON file structure, all you need to know is that t
 ### cat symlink.json
 ```json
 {
-    "node_modules": {
-        "chartjs": false,
-        "jquery": {
-            "dist": "public/static/@jquery/dist"
-        },
-        "mathjax": false,
-        "popperjs": false,
-        "prismjs": {
-            "": "public/static/prismjs"
-        },
-        "stackblitz": false,
-        "tinymce": false
-    },
-    "vendor": {
+    "require": {
+        "php": false,
+        "sentry/sentry": false,
+        "vlucas/phpdotenv": false,
         "twbs/bootstrap": {
             "dist": "public/static/bs/dist"
         },
@@ -125,6 +113,15 @@ If you are familiar with the JSON file structure, all you need to know is that t
             "font": "public/static/bs/font",
             "icons": "public/static/bs/icons"
         }
+    },
+    "dependencies": {
+        "jquery": {
+            "dist": "public/static/@jquery/dist"
+        },
+        "prismjs": {
+            "": "public/static/prismjs"
+        }
     }
+
 }
 ```
