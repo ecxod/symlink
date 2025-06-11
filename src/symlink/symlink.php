@@ -14,9 +14,10 @@ use function Ecxod\Funktionen\{m, logg, addIfNotExists};
 class symlink
 {
 
-
-
-
+    protected string $composer_json;
+    protected string $package_json;
+    protected string $symlink_json;
+    protected string $symlink_example_json;
 
     /** 
      * @return void
@@ -25,6 +26,13 @@ class symlink
      */
     public function __construct()
     {
+        $this->composer_json = 'composer.json';
+
+        $this->package_json = 'package.json';
+
+        $this->symlink_json = 'symlink.json';
+
+        $this->symlink_example_json = 'symlink-example.json';
 
         $this->create_symlink_example();
 
@@ -44,47 +52,83 @@ class symlink
     }
 
 
+
+
+
+    protected function get_object_from_json(string $jsonfile)
+    {
+
+        $json= $this->getWorkspace() . DIRECTORY_SEPARATOR . $jsonfile;
+
+        if(!file_exists($json) || !is_readable($json))
+        {
+            throw new RuntimeException("$jsonfile nicht gefunden oder nicht lesbar");
+        }
+        $string = file_get_contents($json);
+        if($string === false)
+        {
+            throw new RuntimeException("Konnte $jsonfile nicht lesen");
+        }
+        $obj = json_decode($string, true, 512, JSON_INVALID_UTF8_SUBSTITUTE);
+        if(json_last_error() !== JSON_ERROR_NONE)
+        {
+            throw new JsonException("Ungültiges JSON in $jsonfile: " . json_last_error_msg());
+        }
+        return $obj;
+    }
+
+
+
+
+
     protected function create_symlink_example()
     {
         try
         {
 
             // Pfade zu den JSON-Dateien
-            $composer_json            = $this->getWorkspace() . DIRECTORY_SEPARATOR . 'composer.json';
-            $package_json             = $this->getWorkspace() . DIRECTORY_SEPARATOR . 'package.json';
+            // $composer_json_absolute            = $this->getWorkspace() . DIRECTORY_SEPARATOR . 'composer.json';
+            //$package_json_absolute             = $this->getWorkspace() . DIRECTORY_SEPARATOR . 'package.json';
             $symlink_example_existent = $this->getWorkspace() . DIRECTORY_SEPARATOR . 'symlink-example.json';
 
-            // Prüfe und lese composer.json
-            if(!file_exists($composer_json) || !is_readable($composer_json))
-            {
-                throw new RuntimeException("composer.json nicht gefunden oder nicht lesbar");
-            }
-            $composer_content = file_get_contents($composer_json);
-            if($composer_content === false)
-            {
-                throw new RuntimeException("Konnte composer.json nicht lesen");
-            }
-            $composer_obj = json_decode($composer_content, true, 512, JSON_INVALID_UTF8_SUBSTITUTE);
-            if(json_last_error() !== JSON_ERROR_NONE)
-            {
-                throw new JsonException("Ungültiges JSON in composer.json: " . json_last_error_msg());
-            }
+            // // Prüfe und lese composer.json
+            // if(!file_exists($composer_json_absolute) || !is_readable($composer_json_absolute))
+            // {
+            //     throw new RuntimeException("composer.json nicht gefunden oder nicht lesbar");
+            // }
+            // $composer_content = file_get_contents($composer_json_absolute);
+            // if($composer_content === false)
+            // {
+            //     throw new RuntimeException("Konnte composer.json nicht lesen");
+            // }
+            // $composer_obj = json_decode($composer_content, true, 512, JSON_INVALID_UTF8_SUBSTITUTE);
+            // if(json_last_error() !== JSON_ERROR_NONE)
+            // {
+            //     throw new JsonException("Ungültiges JSON in composer.json: " . json_last_error_msg());
+            // }
 
-            // Prüfe und lese package.json
-            if(!file_exists($package_json) || !is_readable($package_json))
-            {
-                throw new RuntimeException("package.json nicht gefunden oder nicht lesbar");
-            }
-            $package_content = file_get_contents($package_json);
-            if($package_content === false)
-            {
-                throw new RuntimeException("Konnte package.json nicht lesen");
-            }
-            $package_obj = json_decode($package_content, true, 512, JSON_INVALID_UTF8_SUBSTITUTE);
-            if(json_last_error() !== JSON_ERROR_NONE)
-            {
-                throw new JsonException("Ungültiges JSON in package.json: " . json_last_error_msg());
-            }
+            $composer_obj = $this->get_object_from_json($this->composer_json);
+
+            // // Prüfe und lese package.json
+            // if(!file_exists($package_json_absolute) || !is_readable($package_json_absolute))
+            // {
+            //     throw new RuntimeException("package.json nicht gefunden oder nicht lesbar");
+            // }
+            // $package_content = file_get_contents($package_json_absolute);
+            // if($package_content === false)
+            // {
+            //     throw new RuntimeException("Konnte package.json nicht lesen");
+            // }
+            // $package_obj = json_decode($package_content, true, 512, JSON_INVALID_UTF8_SUBSTITUTE);
+            // if(json_last_error() !== JSON_ERROR_NONE)
+            // {
+            //     throw new JsonException("Ungültiges JSON in package.json: " . json_last_error_msg());
+            // }
+
+            $package_obj = $this->get_object_from_json($this->package_json);
+
+
+
 
             // Prüfe erforderliche Schlüssel
             if(!isset($composer_obj['require'], $package_obj['dependencies']))
