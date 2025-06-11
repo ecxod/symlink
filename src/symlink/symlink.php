@@ -40,7 +40,6 @@ class symlink
 
     }
 
-
     protected function getWorkspace()
     {
         $workspace = realpath($_SERVER['DOCUMENT_ROOT'] . "/..");
@@ -91,9 +90,6 @@ class symlink
         $obj    = $this->get_obj_from_json($string, $jsonfile);
         return $obj;
     }
-
-
-
 
     protected function create_symlink_example()
     {
@@ -149,8 +145,6 @@ class symlink
                 throw new RuntimeException("Verzeichnis für $this->symlink_example_json ist nicht beschreibbar");
             }
 
-
-
             // Kodiere die Daten nur einmal und schreibe die Ausgabedatei
             $symlink_json = json_encode($symlink_data, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
             $symlink_json = str_replace('\/', '/', $symlink_json);
@@ -166,7 +160,6 @@ class symlink
             exit("Ein Fehler ist aufgetreten: " . $e->getMessage());
         }
     }
-
 
 
     public function setSymlinksFromJson()
